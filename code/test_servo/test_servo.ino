@@ -1,4 +1,4 @@
-// code afin de tester la demarche du quadripod
+// ce code permet de bien placer les servo lors du montage du robot
 
 #include <Servo.h>
 

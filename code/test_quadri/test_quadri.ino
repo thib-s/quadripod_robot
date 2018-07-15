@@ -25,6 +25,17 @@ int indexes[] = { 9, 4, 7, 2, 5, 8, 3, 6};
 Servo servos[8];  // tableau contenant les objet servos
 // heureusement pour nous, un max de 8 objets servos peuvent etre crées
 
+/*
+   indique l'amplitude pour lever et baisser les pates
+   la hauteur des pates etant definie comme position au repos +- delta
+   pas besoin de trop essayer de comprendre ce bout, ca viendra en lisant le code
+*/
+static int delta = 15                                                                                                                                                                  ;
+
+/*
+ * le temps de temporisation entre chaque étape de la démarche
+ */
+static int temporisation_time = 250;
 
 /*
    le tableau init_angles indique quel angles doivent prendre chaque servo au debut du programm
@@ -34,14 +45,14 @@ Servo servos[8];  // tableau contenant les objet servos
    angle du coude avant droite = 120 degrees (seconde case du tableau)
    etc...
 */
-int init_angles[] = {90, 120, 90, 60, 90, 60, 90, 120};
+int init_angles[] = {90, 90 + delta, 90, 90 - delta, 90, 90 - delta, 90, 90 + delta};
 
 /*
    ce tableau permet d'jouter un offset sur les servomoteurs, cela permet de corriger les
    erreurs d'assemblage, ici, par ex, l'epaule arriere droite (servo 5) etait trop en arriere,
    d'ou une correction de 20 degrees
 */
-int correction[] = { -10, 10, 10, -10,  20, -10, -10, 10};
+int correction[] = { -10, 10, 10, 0,  20, -10, -10, 0};
 
 /*
    au setup, on alloue les pin aux servos, et on donne au quadripod sa position initiale
@@ -53,18 +64,19 @@ void setup()
      sur la revA, il n'y a pas de diodes entre le 5V et l'étage d'alim, le 5v de l'arduino
      alimente donc indirectement les servos, et l'arduino se retrouve sous alimenté quand
      les servos bougent, rendant la reprogrammation impossible. Ce delay laisse donc un laps de temps
-     pour pouvoir reflasher l'arduino (oui c'esttrès gitan, mais j'ai la flemme de fraver un pcb pour
+     pour pouvoir reflasher l'arduino (oui c'est très gitan, mais j'ai la flemme de graver un pcb pour
      la revB)
   */
-  delay(1000);
+  delay(2000);
   // on alloue les pins, et on place les servos dans leurs positions initiales
   for (int i = 0; i < 8; i++) {
     servos[i].attach(indexes[i]);
-    servos[i].write(init_angles[i]);
+    servos[i].write(init_angles[i] + correction[i]);
     // un petit delay est ajouté afin d'éviter que tous les servos bougent en même
     // temps, les alims, sont un peu limite pour l'usage qui en est fait ^^
-    delay(250);
+    delay(temporisation_time);
   }
+  delay(10000);
 }
 
 /*
@@ -125,10 +137,10 @@ void move_general(float linear, float angular) {
      la marche arrière est obtenue en jouant la sequence a l'envers
   */
   int angles_linear[4][8] = {
-    {75, 90, 70, 30,  110, 30, 105, 90},
-    {75, 150, 70, 90,  110, 90, 105, 150},
-    {110, 150, 110, 90,  75, 90, 60, 150},
-    {110, 90, 110, 30,  75, 30, 60, 90}
+    {75,  90,       70, 90 - delta,  110, 90 - delta, 105, 90},
+    {75,  90 + delta, 70, 90,        110, 90,       105, 90 + delta},
+    {110, 90 + delta, 110, 90,       75,  90,       60,  90 + delta},
+    {110, 90,       110, 90 - delta, 75,  90 - delta, 60,  90}
   };
   /*
      on fait de meme pour une demarche de rotation pure
@@ -136,10 +148,10 @@ void move_general(float linear, float angular) {
       jouant la sequence a l"envers
   */
   int angles_angular[4][8] = {
-    {110, 90, 70, 30,  75, 30, 105, 90},
-    {110, 150, 70, 90,  75, 90, 105, 150},
-    {75, 150, 110, 90,  110, 90, 60, 150},
-    {75, 90, 110, 30,  110, 30, 60, 90}
+    {110, 90,       70,  90 - delta,  75,  90 - delta, 105, 90},
+    {110, 90 + delta, 70,  90,        75,  90,       105, 90 + delta},
+    {75,  90 + delta, 110, 90,        110, 90,       60,  90 + delta},
+    {75,  90,       110, 90 - delta,  110, 90 - delta, 60,  90}
   };
   // on joue sequentiellement chaque etape de la marche
   for (int act = 0; act < 4; act++) {
@@ -172,7 +184,7 @@ void move_general(float linear, float angular) {
     // attention a ne pas trop le diminuer, en plus de ne plus atteindre les consignes
     // cela pomperait beaucoup de courant sur des alimentations qui sont déjà limite
     // sorry je suis pas très bon en électronique ^^
-    delay(250);
+    delay(temporisation_time);
   }
 }
 
@@ -184,5 +196,51 @@ void perform_step(int angles[]) {
   for (int i = 0; i < 8; i++) {
     servos[i].write(angles[i] + correction[i]);
   }
+}
+
+/*
+ * fonction pour changer le delta dynamiquement
+ * la nouvelle valeur doit être située dans l'intervalle [0, 120[
+ * renvoie true si la valeur a été changée, false si non
+ */
+bool set_delta(int new_delta){
+  if ((new_delta >= 0) && (new_delta < 120)){
+    delta = new_delta;
+    return true; 
+  }
+  return false;
+}
+
+/**
+ * fonction pour changer le delai entre les étapes de la marche
+ * le delai doit être positif
+ * renvoie true si le delai a été changé, false si non
+ */
+bool set_tempo(int new_tempo){
+  if (new_tempo > 0){
+    temporisation_time = new_tempo;
+    return true;
+  }
+  return false;
+}
+
+/*
+ * fonction pour modifier la hauteur du corps lors de la demarche
+ * la variable amount correspond aux nombre de degrés ajoutés aux pates
+ * afin de faire monter le corps.
+ * amount peut etre positif (monter) ou négatif (descendre)
+ */
+void increase_body_height(int amount){
+  correction[1] += amount;
+  correction[3] -= amount;
+  correction[5] -= amount;
+  correction[7] += amount;
+}
+
+void tilt_body(int amount){
+  correction[1] += amount;
+  correction[3] -= amount;
+  correction[5] += amount;
+  correction[7] -= amount;
 }
 
