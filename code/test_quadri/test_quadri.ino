@@ -33,8 +33,8 @@ Servo servos[8];  // tableau contenant les objet servos
 static int delta = 15                                                                                                                                                                  ;
 
 /*
- * le temps de temporisation entre chaque étape de la démarche
- */
+   le temps de temporisation entre chaque étape de la démarche
+*/
 static int temporisation_time = 250;
 
 /*
@@ -54,6 +54,20 @@ int init_angles[] = {90, 90 + delta, 90, 90 - delta, 90, 90 - delta, 90, 90 + de
 */
 int correction[] = { -10, 10, 10, 0,  20, -10, -10, 0};
 
+
+/*
+   TODO doc sur la comm
+*/
+#define MOVE 0
+#define SET_DELTA 1
+
+int function_id;
+int int_params[2];
+float float_params[2];
+
+String input_string = "";         // a String to hold incoming data
+boolean command_refreshed = false;  // whether the string is complete
+
 /*
    au setup, on alloue les pin aux servos, et on donne au quadripod sa position initiale
 */
@@ -67,7 +81,11 @@ void setup()
      pour pouvoir reflasher l'arduino (oui c'est très gitan, mais j'ai la flemme de graver un pcb pour
      la revB)
   */
-  delay(2000);
+  delay(5000);
+
+  Serial.begin(9600);
+  // reserve 200 bytes for the inputString:
+  input_string.reserve(200);
   // on alloue les pins, et on place les servos dans leurs positions initiales
   for (int i = 0; i < 8; i++) {
     servos[i].attach(indexes[i]);
@@ -76,7 +94,6 @@ void setup()
     // temps, les alims, sont un peu limite pour l'usage qui en est fait ^^
     delay(temporisation_time);
   }
-  delay(10000);
 }
 
 /*
@@ -86,28 +103,30 @@ void setup()
 */
 void loop()
 {
-  // et 20 pas en avant!
-  for (int i = 0; i < 20; i++) {
-    move_general(0.75, 0.5);
+  if (command_refreshed) {
+    switch (function_id) {
+      case MOVE:
+        move_general(float_params[0], float_params[1]);
+        command_refreshed = false;
+        break;
+      case SET_DELTA:
+        set_delta(int_params[0]);
+        command_refreshed = false;
+        break;
+      default:
+        break;
+    }
+  } else {
+    Serial.println("doing nothing");
+    perform_step(init_angles);
   }
-  perform_step(init_angles);
-  delay(1000);
-  //et 5 pas sur le coté!
-  for (int i = 0; i < 5; i++) {
-    move_general(0.5, 0.1);
-  }
-  perform_step(init_angles);
-  delay(1000);
-  // il etait un robot, qui essayait d'marcher
-  for (int i = 0; i < 20; i++) {
-    move_general(0.75, 0.5);
-  }
-  perform_step(init_angles);
-  delay(1000);
-  // il chantait haut et fort, qu'il n'allait pas griller
-  for (int i = 0; i < 20; i++) {
-    move_general(0.75, 0.25);
-  }
+  /*
+    if (Serial.find("set_delay(")) {
+    int val = Serial.parseInt();
+    Serial.print("set_delay(");
+    Serial.print(val, DEC);
+    Serial.println(")");
+    }*/
 }
 
 /*
@@ -199,25 +218,25 @@ void perform_step(int angles[]) {
 }
 
 /*
- * fonction pour changer le delta dynamiquement
- * la nouvelle valeur doit être située dans l'intervalle [0, 120[
- * renvoie true si la valeur a été changée, false si non
- */
-bool set_delta(int new_delta){
-  if ((new_delta >= 0) && (new_delta < 120)){
+   fonction pour changer le delta dynamiquement
+   la nouvelle valeur doit être située dans l'intervalle [0, 120[
+   renvoie true si la valeur a été changée, false si non
+*/
+bool set_delta(int new_delta) {
+  if ((new_delta >= 0) && (new_delta < 120)) {
     delta = new_delta;
-    return true; 
+    return true;
   }
   return false;
 }
 
 /**
- * fonction pour changer le delai entre les étapes de la marche
- * le delai doit être positif
- * renvoie true si le delai a été changé, false si non
- */
-bool set_tempo(int new_tempo){
-  if (new_tempo > 0){
+   fonction pour changer le delai entre les étapes de la marche
+   le delai doit être positif
+   renvoie true si le delai a été changé, false si non
+*/
+bool set_tempo(int new_tempo) {
+  if (new_tempo > 0) {
     temporisation_time = new_tempo;
     return true;
   }
@@ -225,22 +244,76 @@ bool set_tempo(int new_tempo){
 }
 
 /*
- * fonction pour modifier la hauteur du corps lors de la demarche
- * la variable amount correspond aux nombre de degrés ajoutés aux pates
- * afin de faire monter le corps.
- * amount peut etre positif (monter) ou négatif (descendre)
- */
-void increase_body_height(int amount){
+   fonction pour modifier la hauteur du corps lors de la demarche
+   la variable amount correspond aux nombre de degrés ajoutés aux pates
+   afin de faire monter le corps.
+   amount peut etre positif (monter) ou négatif (descendre)
+*/
+void increase_body_height(int amount) {
   correction[1] += amount;
   correction[3] -= amount;
   correction[5] -= amount;
   correction[7] += amount;
 }
 
-void tilt_body(int amount){
+void tilt_body(int amount) {
   correction[1] += amount;
   correction[3] -= amount;
   correction[5] += amount;
   correction[7] -= amount;
 }
+
+/*
+   Code from: https://www.arduino.cc/en/Tutorial/SerialEvent
+  SerialEvent occurs whenever a new data comes in the hardware serial RX. This
+  routine is run between each time loop() runs, so using delay inside loop can
+  delay response. Multiple bytes of data may be available.
+*/
+void serialEvent() {
+  while (Serial.available()) {
+    // get the new byte:
+    char inChar = (char)Serial.read();
+    // add it to the inputString:
+    input_string += inChar;
+    // if the incoming character is a newline, set a flag so the main loop can
+    // do something about it:
+    if (inChar == '\n') {
+      refresh_command();
+    }
+  }
+}
+
+void refresh_command() {
+  input_string.trim();
+  if (input_string.startsWith("move(")) {
+    if (input_string.endsWith(")")) {
+      int index_param2 = input_string.indexOf(',');
+      if (index_param2 != -1) {
+        float_params[0] = input_string.substring(5).toFloat();
+        float_params[1] = input_string.substring(index_param2 + 1).toFloat();
+        function_id = MOVE;
+        command_refreshed = true;
+      } else {
+        Serial.println("unable to parse params, aborting");
+      }
+    } else {
+      Serial.println("malformed commmand, aborting");
+    }
+  } else {
+    if (input_string.startsWith("set_delta(")) {
+      if (input_string.endsWith(")")) {
+        int_params[0] = input_string.substring(10).toInt();
+        function_id = SET_DELTA;
+        command_refreshed = true;
+      } else {
+        Serial.println("unable to parse params, aborting");
+      }
+    } else {
+      Serial.println("unknown commmand");
+    }
+  }
+  // clear the string:
+  input_string = "";
+}
+
 
