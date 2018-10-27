@@ -1,0 +1,4 @@
+[submodule "code/ros_nodes/src/raspicam_node"]
+	path = code/ros_nodes/src/raspicam_node
+	url = https://github.com/UbiquityRobotics/raspicam_node.git
+	branch = indigo
