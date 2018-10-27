@@ -83,9 +83,9 @@ void setup()
   */
   delay(5000);
 
-  Serial.begin(9600);
+  Serial.begin(1200);
   // reserve 200 bytes for the inputString:
-  input_string.reserve(200);
+  input_string.reserve(2000);
   // on alloue les pins, et on place les servos dans leurs positions initiales
   for (int i = 0; i < 8; i++) {
     servos[i].attach(indexes[i]);
