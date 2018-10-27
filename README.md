@@ -3,6 +3,11 @@ quadripod\_robot
 
 all the files to build a quadripod, including 3d model, eagle files and arduino code
 
+Disclaimer
+==========
+
+This is a personal project, this means that this quadripod was build in a single exemplary. It worked fine for me, but i cannot be held responsible if you fry somehing using my plans.
+
 Repository organization
 =======================
 
