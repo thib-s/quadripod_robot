@@ -1,7 +1,7 @@
 quadripod\_robot
 ===============
 
-all the files to build a quadripod, including 3d model, eagle files and arduino code
+all the files to build a quadripod, including 3d model, eagle files and arduino code.
 
 Disclaimer
 ==========
@@ -24,4 +24,4 @@ Contains the eagle files for the pcb manufacturing.
 code
 ----
 
-Contains the code to set up and run the robot.
+Contains the code to set up and run the robot. It is splitten in two parts: the ros nodes in the ros\_node folder, the 	test\_quadri (to be renamed ) contains the code that configure and perform the gait. Test\_servo folder contain code to check if the servos are well wired and the joint correctly set.
