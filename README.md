@@ -1,7 +1,9 @@
-quadripod\_robot
-===============
+Quadripod robot
+===================
 
 all the files to build a quadripod, including 3d model, eagle files and arduino code.
+
+![alt text](https://github.com/thib-s/quadripod_robot/raw/master/jacob.jpg)
 
 Disclaimer
 ==========
