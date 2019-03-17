@@ -30,12 +30,12 @@ Servo servos[8];  // tableau contenant les objet servos
    la hauteur des pates etant definie comme position au repos +- delta
    pas besoin de trop essayer de comprendre ce bout, ca viendra en lisant le code
 */
-static int delta = 15                                                                                                                                                                  ;
+static int delta = 20;
 
 /*
    le temps de temporisation entre chaque étape de la démarche
 */
-static int temporisation_time = 250;
+static int temporisation_time = 125;
 
 /*
    le tableau init_angles indique quel angles doivent prendre chaque servo au debut du programm
@@ -52,14 +52,17 @@ int init_angles[] = {90, 90 + delta, 90, 90 - delta, 90, 90 - delta, 90, 90 + de
    erreurs d'assemblage, ici, par ex, l'epaule arriere droite (servo 5) etait trop en arriere,
    d'ou une correction de 20 degrees
 */
-int correction[] = { -10, 10, 10, 0,  20, -10, -10, 0};
+int correction[] = { -10, 15, 10, 0,  20, 0, -10, -15};
 
 
 /*
    TODO doc sur la comm
 */
+#define NONE -1
 #define MOVE 0
 #define SET_DELTA 1
+#define RAISE_BODY 2
+#define TILT_BODY 3
 
 int function_id;
 int int_params[2];
@@ -67,6 +70,9 @@ float float_params[2];
 
 String input_string = "";         // a String to hold incoming data
 boolean command_refreshed = false;  // whether the string is complete
+
+static int tilt = 0;
+static int height = 0;
 
 /*
    au setup, on alloue les pin aux servos, et on donne au quadripod sa position initiale
@@ -113,12 +119,21 @@ void loop()
         set_delta(int_params[0]);
         command_refreshed = false;
         break;
+      case TILT_BODY:
+        tilt_body(int_params[0]);
+        command_refreshed = false;
+        break;
+      case RAISE_BODY:
+        raise_body(int_params[0]);
+        command_refreshed = false;
+        break;
       default:
         break;
     }
   } else {
     Serial.println("doing nothing");
     perform_step(init_angles);
+    delay(50);
   }
   /*
     if (Serial.find("set_delay(")) {
@@ -207,6 +222,25 @@ void move_general(float linear, float angular) {
   }
 }
 
+void say_hi() {
+  int angles_seq[6][8] = {
+    {75,  90        , 90, 90 - delta, 90, 90 - delta, 90, 90 + delta},
+    {40, 90        , 90, 90 - delta, 90, 90 - delta, 90, 90 + delta},
+    {75,  90        , 90, 90 - delta, 90, 90 - delta, 90, 90 + delta},
+    {40, 90        , 90, 90 - delta, 90, 90 - delta, 90, 90 + delta},
+    {75,  90        , 90, 90 - delta, 90, 90 - delta, 90, 90 + delta},
+    {90,  90 + delta, 90, 90 - delta, 90, 90 - delta, 90, 90 + delta}
+  };
+  // on joue sequentiellement chaque etape
+  for (int act = 0; act < 6; act++) {
+    // a chaque etape de la marche, on actualise tous les servos
+    for (int serv = 0; serv < 8; serv++) {
+      servos[serv].write(angles_seq[act][serv] + correction[serv]);
+      delay(30);
+    }
+  }
+}
+
 
 /*
    petite fonction qui permet d'appliquer une consigne a tous les servomoteurs
@@ -223,7 +257,7 @@ void perform_step(int angles[]) {
    renvoie true si la valeur a été changée, false si non
 */
 bool set_delta(int new_delta) {
-  if ((new_delta >= 0) && (new_delta < 120)) {
+  if ((new_delta >= 0) && (new_delta < 20)) {
     delta = new_delta;
     return true;
   }
@@ -249,18 +283,28 @@ bool set_tempo(int new_tempo) {
    afin de faire monter le corps.
    amount peut etre positif (monter) ou négatif (descendre)
 */
-void increase_body_height(int amount) {
-  correction[1] += amount;
-  correction[3] -= amount;
-  correction[5] -= amount;
-  correction[7] += amount;
+int raise_body(int amount) {
+  if (((height + amount) > 20) && ((height + amount) > -20)) {
+    correction[1] += amount;
+    correction[3] -= amount;
+    correction[5] -= amount;
+    correction[7] += amount;
+    return true;
+  } else {
+    return false;
+  }
 }
 
-void tilt_body(int amount) {
-  correction[1] += amount;
-  correction[3] -= amount;
-  correction[5] += amount;
-  correction[7] -= amount;
+int tilt_body(int amount) {
+  if (((height + amount) > 20) && ((height + amount) > -20)) {
+    correction[1] += amount;
+    correction[3] -= amount;
+    correction[5] += amount;
+    correction[7] -= amount;
+    return true;
+  } else {
+    return false;
+  }
 }
 
 /*
@@ -309,11 +353,29 @@ void refresh_command() {
         Serial.println("unable to parse params, aborting");
       }
     } else {
-      Serial.println("unknown commmand");
+      if (input_string.startsWith("raise_body(")) {
+        if (input_string.endsWith(")")) {
+          int_params[0] = input_string.substring(11).toInt();
+          function_id = RAISE_BODY;
+          command_refreshed = true;
+        } else {
+          Serial.println("unable to parse params, aborting");
+        }
+      } else {
+        if (input_string.startsWith("tilt_body(")) {
+          if (input_string.endsWith(")")) {
+            int_params[0] = input_string.substring(10).toInt();
+            function_id = TILT_BODY;
+            command_refreshed = true;
+          } else {
+            Serial.println("unable to parse params, aborting");
+          }
+        } else {
+          Serial.println("unknown commmand");
+        }
+      }
     }
   }
   // clear the string:
   input_string = "";
 }
-
-
