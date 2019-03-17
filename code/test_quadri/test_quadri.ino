@@ -54,19 +54,39 @@ int init_angles[] = {90, 90 + delta, 90, 90 - delta, 90, 90 - delta, 90, 90 + de
 */
 int correction[] = { -10, 15, 10, 0,  20, 0, -10, -15};
 
+typedef bool (*funcptr)();
+
+struct command{
+  funcptr func;
+  String signature;
+};
 
 /*
    TODO doc sur la comm
 */
-#define NONE -1
-#define MOVE 0
-#define SET_DELTA 1
-#define RAISE_BODY 2
-#define TILT_BODY 3
 
-int function_id;
+extern bool move_general(float, float);
+extern bool set_delta(int);
+extern bool tilt_body(int);
+extern bool raise_body(int);
+extern bool say_hi();
+extern bool display_error();
+
+
+#define INT 1000
+#define FLOAT 1001
+
+command MOVE = { &move_general, "ff"};
+command SET_DELTA = { &set_delta, "i"};
+command TILT_BODY = { &tilt_body, "i"};
+command RAISE_BODY = { &raise_body, "i"};
+command SAY_HI = { &say_hi, ""};
+command FAILED_PARSING = { &display_error, ""};
+
+funcptr func;
 int int_params[2];
 float float_params[2];
+String str_param = "command failed";
 
 String input_string = "";         // a String to hold incoming data
 boolean command_refreshed = false;  // whether the string is complete
@@ -110,28 +130,10 @@ void setup()
 void loop()
 {
   if (command_refreshed) {
-    switch (function_id) {
-      case MOVE:
-        move_general(float_params[0], float_params[1]);
-        command_refreshed = false;
-        break;
-      case SET_DELTA:
-        set_delta(int_params[0]);
-        command_refreshed = false;
-        break;
-      case TILT_BODY:
-        tilt_body(int_params[0]);
-        command_refreshed = false;
-        break;
-      case RAISE_BODY:
-        raise_body(int_params[0]);
-        command_refreshed = false;
-        break;
-      default:
-        break;
-    }
+    (*func)(); // call the function
+    command_refreshed = false;
   } else {
-    Serial.println("doing nothing");
+//    Serial.println("doing nothing");
     perform_step(init_angles);
     delay(50);
   }
@@ -156,7 +158,7 @@ void loop()
    il est bien sur possible de combiner les deux pour avancer en tournant!
    le robot est donc quasi holonome. ;)
 */
-void move_general(float linear, float angular) {
+extern bool move_general() {
   /*
      comment ca marche la dedans ? on a une sequence de positions préenregistrées
      pour une marche en ligne droite dans la matrice suivante
@@ -170,6 +172,12 @@ void move_general(float linear, float angular) {
 
      la marche arrière est obtenue en jouant la sequence a l'envers
   */
+  float linear = float_params[0];
+  float angular = float_params[1];
+  Serial.print("moving ");
+  Serial.print(linear);
+  Serial.print(",");
+  Serial.println(angular);
   int angles_linear[4][8] = {
     {75,  90,       70, 90 - delta,  110, 90 - delta, 105, 90},
     {75,  90 + delta, 70, 90,        110, 90,       105, 90 + delta},
@@ -220,9 +228,11 @@ void move_general(float linear, float angular) {
     // sorry je suis pas très bon en électronique ^^
     delay(temporisation_time);
   }
+  return true;
 }
 
-void say_hi() {
+extern bool say_hi() {
+  Serial.println("saying hi");
   int angles_seq[6][8] = {
     {75,  90        , 90, 90 - delta, 90, 90 - delta, 90, 90 + delta},
     {40, 90        , 90, 90 - delta, 90, 90 - delta, 90, 90 + delta},
@@ -239,6 +249,7 @@ void say_hi() {
       delay(30);
     }
   }
+  return true;
 }
 
 
@@ -256,7 +267,10 @@ void perform_step(int angles[]) {
    la nouvelle valeur doit être située dans l'intervalle [0, 120[
    renvoie true si la valeur a été changée, false si non
 */
-bool set_delta(int new_delta) {
+extern bool set_delta() {
+  int new_delta = int_params[0];
+  Serial.print("setting delta ");
+  Serial.println(new_delta);
   if ((new_delta >= 0) && (new_delta < 20)) {
     delta = new_delta;
     return true;
@@ -269,7 +283,10 @@ bool set_delta(int new_delta) {
    le delai doit être positif
    renvoie true si le delai a été changé, false si non
 */
-bool set_tempo(int new_tempo) {
+extern bool set_tempo() {
+  int new_tempo = int_params[0];
+  Serial.print("setting tempo ");
+  Serial.println(new_tempo);
   if (new_tempo > 0) {
     temporisation_time = new_tempo;
     return true;
@@ -283,7 +300,10 @@ bool set_tempo(int new_tempo) {
    afin de faire monter le corps.
    amount peut etre positif (monter) ou négatif (descendre)
 */
-int raise_body(int amount) {
+extern bool raise_body() {
+  int amount = int_params[0];
+  Serial.print("raising body");
+  Serial.println(amount);
   if (((height + amount) > 20) && ((height + amount) > -20)) {
     correction[1] += amount;
     correction[3] -= amount;
@@ -295,7 +315,10 @@ int raise_body(int amount) {
   }
 }
 
-int tilt_body(int amount) {
+extern bool tilt_body() {
+  int amount = int_params[0];
+  Serial.print("tilting body");
+  Serial.println(amount);
   if (((height + amount) > 20) && ((height + amount) > -20)) {
     correction[1] += amount;
     correction[3] -= amount;
@@ -305,6 +328,10 @@ int tilt_body(int amount) {
   } else {
     return false;
   }
+}
+
+extern bool display_error() {
+  Serial.println(str_param);
 }
 
 /*
@@ -327,55 +354,69 @@ void serialEvent() {
   }
 }
 
+/*
+ * this function find which function id is associed to the command string
+ */
+command get_command(){
+  command result = FAILED_PARSING;
+  input_string.trim();
+  if ((input_string.startsWith("move(")) && (input_string.endsWith(")"))){
+    result = MOVE;
+  }
+  if ((input_string.startsWith("set_delta(")) && (input_string.endsWith(")"))){
+    result = SET_DELTA;
+  }
+  if ((input_string.startsWith("tilt_body(")) && (input_string.endsWith(")"))){
+    result = TILT_BODY;
+  }
+  if ((input_string.startsWith("raise_body(")) && (input_string.endsWith(")"))){
+    result = RAISE_BODY;
+  }
+  if ((input_string.startsWith("say_hi(")) && (input_string.endsWith(")"))){
+    result = SAY_HI;
+  }
+  return result;
+}
+
+bool parse_param(int from, int param_no, char param_type){
+  int result = false;
+  switch (param_type){
+    case 'f':
+    float_params[param_no] = input_string.substring(from).toFloat();
+    result = true;
+    break;
+    case 'i':
+    int_params[param_no] = input_string.substring(from).toInt();
+    result = true;
+    break;
+  }
+  return result;
+}
+
 void refresh_command() {
   input_string.trim();
-  if (input_string.startsWith("move(")) {
-    if (input_string.endsWith(")")) {
-      int index_param2 = input_string.indexOf(',');
-      if (index_param2 != -1) {
-        float_params[0] = input_string.substring(5).toFloat();
-        float_params[1] = input_string.substring(index_param2 + 1).toFloat();
-        function_id = MOVE;
-        command_refreshed = true;
-      } else {
-        Serial.println("unable to parse params, aborting");
-      }
-    } else {
-      Serial.println("malformed commmand, aborting");
+  // first we get the command to run
+  command com = get_command();
+  // second we get params type list and the position of the next param
+  int count = com.signature.length();
+  int next_param_index = input_string.indexOf('(') + 1;
+  int offset = next_param_index;
+  bool parse_success = true;
+  for (int i = 0; i < count; i++)
+  {
+    if ((! parse_success) || ( offset == 0 )){
+      // if the function returned false, it means that it failed to parse the params
+      com = FAILED_PARSING;
+      str_param = "unable to parse params for command";
+      break;
     }
-  } else {
-    if (input_string.startsWith("set_delta(")) {
-      if (input_string.endsWith(")")) {
-        int_params[0] = input_string.substring(10).toInt();
-        function_id = SET_DELTA;
-        command_refreshed = true;
-      } else {
-        Serial.println("unable to parse params, aborting");
-      }
-    } else {
-      if (input_string.startsWith("raise_body(")) {
-        if (input_string.endsWith(")")) {
-          int_params[0] = input_string.substring(11).toInt();
-          function_id = RAISE_BODY;
-          command_refreshed = true;
-        } else {
-          Serial.println("unable to parse params, aborting");
-        }
-      } else {
-        if (input_string.startsWith("tilt_body(")) {
-          if (input_string.endsWith(")")) {
-            int_params[0] = input_string.substring(10).toInt();
-            function_id = TILT_BODY;
-            command_refreshed = true;
-          } else {
-            Serial.println("unable to parse params, aborting");
-          }
-        } else {
-          Serial.println("unknown commmand");
-        }
-      }
-    }
+    // we parse params one by one
+    parse_success = parse_param(next_param_index, i, com.signature[i]);
+    offset = input_string.substring(next_param_index).indexOf(',') + 1;
+    next_param_index = next_param_index + offset;
   }
+  func = com.func;
+  command_refreshed = true;
   // clear the string:
   input_string = "";
 }
