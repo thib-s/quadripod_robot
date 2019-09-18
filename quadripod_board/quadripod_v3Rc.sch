@@ -4523,14 +4523,14 @@ CONN_04
 <part name="GND3" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="GND" device=""/>
 <part name="P+1" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="+12V" device=""/>
 <part name="GND6" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="GND" device=""/>
-<part name="S_C1" library="7robot" deviceset="M03" device="LONGPADS"/>
-<part name="S_C2" library="7robot" deviceset="M03" device="LONGPADS"/>
-<part name="S_C3" library="7robot" deviceset="M03" device="LONGPADS"/>
-<part name="S_C4" library="7robot" deviceset="M03" device="LONGPADS"/>
-<part name="S_E4" library="7robot" deviceset="M03" device="LONGPADS"/>
-<part name="S_E3" library="7robot" deviceset="M03" device="LONGPADS"/>
-<part name="S_E2" library="7robot" deviceset="M03" device="LONGPADS"/>
-<part name="S_E1" library="7robot" deviceset="M03" device="LONGPADS"/>
+<part name="C1" library="7robot" deviceset="M03" device="LONGPADS"/>
+<part name="C2" library="7robot" deviceset="M03" device="LONGPADS"/>
+<part name="C3" library="7robot" deviceset="M03" device="LONGPADS"/>
+<part name="C4" library="7robot" deviceset="M03" device="LONGPADS"/>
+<part name="E4" library="7robot" deviceset="M03" device="LONGPADS"/>
+<part name="E3" library="7robot" deviceset="M03" device="LONGPADS"/>
+<part name="E2" library="7robot" deviceset="M03" device="LONGPADS"/>
+<part name="E1" library="7robot" deviceset="M03" device="LONGPADS"/>
 <part name="GND5" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="GND" device=""/>
 <part name="GND8" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="GND" device=""/>
 <part name="GND9" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="GND" device=""/>
@@ -4540,8 +4540,8 @@ CONN_04
 <part name="GND13" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="GND" device=""/>
 <part name="GND14" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="GND" device=""/>
 <part name="D2" library="7robot" deviceset="DIODES_DIODE" device="/DO41"/>
-<part name="BA_CON" library="SparkFun-Connectors" library_urn="urn:adsk.eagle:library:513" deviceset="CONN_02" device="PTH3" package3d_urn="urn:adsk.eagle:package:38048/1" value="M02PTH"/>
-<part name="UART_CON" library="SparkFun-Connectors" library_urn="urn:adsk.eagle:library:513" deviceset="CONN_04" device="LONGPADS" package3d_urn="urn:adsk.eagle:package:38098/1" value="M02PTH"/>
+<part name="BAT" library="SparkFun-Connectors" library_urn="urn:adsk.eagle:library:513" deviceset="CONN_02" device="PTH3" package3d_urn="urn:adsk.eagle:package:38048/1" value="M02PTH"/>
+<part name="UART" library="SparkFun-Connectors" library_urn="urn:adsk.eagle:library:513" deviceset="CONN_04" device="LONGPADS" package3d_urn="urn:adsk.eagle:package:38098/1" value="M02PTH"/>
 <part name="U$2" library="RPI-Zero" deviceset="RPI-ZERO" device=""/>
 <part name="GND4" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="GND" device=""/>
 <part name="GND15" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="GND" device=""/>
@@ -4551,7 +4551,7 @@ CONN_04
 <part name="GND19" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="GND" device=""/>
 <part name="GND20" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="GND" device=""/>
 <part name="GND21" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="GND" device=""/>
-<part name="I2C_CON" library="SparkFun-Connectors" library_urn="urn:adsk.eagle:library:513" deviceset="CONN_04" device="LONGPADS" package3d_urn="urn:adsk.eagle:package:38098/1"/>
+<part name="I2C" library="SparkFun-Connectors" library_urn="urn:adsk.eagle:library:513" deviceset="CONN_04" device="LONGPADS" package3d_urn="urn:adsk.eagle:package:38098/1"/>
 <part name="VCC_SEL" library="7robot" deviceset="STCMS_3" device="/CMS"/>
 <part name="5VB" library="diy-modules" deviceset="DC-DC-STEP-DOWN-LM2596" device="" value=""/>
 <part name="D1" library="7robot" deviceset="DIODES_DIODE" device="/DO41"/>
@@ -4583,35 +4583,35 @@ CONN_04
 <instance part="GND6" gate="1" x="0" y="48.26" smashed="yes">
 <attribute name="VALUE" x="-2.54" y="45.72" size="1.778" layer="96"/>
 </instance>
-<instance part="S_C1" gate="G$1" x="-73.66" y="25.4" smashed="yes">
+<instance part="C1" gate="G$1" x="-73.66" y="25.4" smashed="yes">
 <attribute name="VALUE" x="-76.2" y="17.78" size="1.778" layer="96"/>
 <attribute name="NAME" x="-76.2" y="31.242" size="1.778" layer="95"/>
 </instance>
-<instance part="S_C2" gate="G$1" x="-45.72" y="25.4" smashed="yes">
+<instance part="C2" gate="G$1" x="-45.72" y="25.4" smashed="yes">
 <attribute name="VALUE" x="-48.26" y="17.78" size="1.778" layer="96"/>
 <attribute name="NAME" x="-48.26" y="31.242" size="1.778" layer="95"/>
 </instance>
-<instance part="S_C3" gate="G$1" x="-73.66" y="-10.16" smashed="yes">
+<instance part="C3" gate="G$1" x="-73.66" y="-10.16" smashed="yes">
 <attribute name="VALUE" x="-76.2" y="-17.78" size="1.778" layer="96"/>
 <attribute name="NAME" x="-76.2" y="-4.318" size="1.778" layer="95"/>
 </instance>
-<instance part="S_C4" gate="G$1" x="-45.72" y="-10.16" smashed="yes">
+<instance part="C4" gate="G$1" x="-45.72" y="-10.16" smashed="yes">
 <attribute name="VALUE" x="-48.26" y="-17.78" size="1.778" layer="96"/>
 <attribute name="NAME" x="-48.26" y="-4.318" size="1.778" layer="95"/>
 </instance>
-<instance part="S_E4" gate="G$1" x="-45.72" y="-25.4" smashed="yes">
+<instance part="E4" gate="G$1" x="-45.72" y="-25.4" smashed="yes">
 <attribute name="VALUE" x="-48.26" y="-33.02" size="1.778" layer="96"/>
 <attribute name="NAME" x="-48.26" y="-19.558" size="1.778" layer="95"/>
 </instance>
-<instance part="S_E3" gate="G$1" x="-73.66" y="-25.4" smashed="yes">
+<instance part="E3" gate="G$1" x="-73.66" y="-25.4" smashed="yes">
 <attribute name="VALUE" x="-76.2" y="-33.02" size="1.778" layer="96"/>
 <attribute name="NAME" x="-76.2" y="-19.558" size="1.778" layer="95"/>
 </instance>
-<instance part="S_E2" gate="G$1" x="-45.72" y="10.16" smashed="yes">
+<instance part="E2" gate="G$1" x="-45.72" y="10.16" smashed="yes">
 <attribute name="VALUE" x="-48.26" y="2.54" size="1.778" layer="96"/>
 <attribute name="NAME" x="-48.26" y="16.002" size="1.778" layer="95"/>
 </instance>
-<instance part="S_E1" gate="G$1" x="-73.66" y="10.16" smashed="yes">
+<instance part="E1" gate="G$1" x="-73.66" y="10.16" smashed="yes">
 <attribute name="VALUE" x="-76.2" y="2.54" size="1.778" layer="96"/>
 <attribute name="NAME" x="-76.2" y="16.002" size="1.778" layer="95"/>
 </instance>
@@ -4643,11 +4643,11 @@ CONN_04
 <attribute name="NAME" x="-12.065" y="113.665" size="1.778" layer="95"/>
 <attribute name="VALUE" x="-14.605" y="107.95" size="1.778" layer="96"/>
 </instance>
-<instance part="BA_CON" gate="G$1" x="-7.62" y="50.8" smashed="yes" rot="R90">
+<instance part="BAT" gate="G$1" x="-7.62" y="50.8" smashed="yes" rot="R90">
 <attribute name="VALUE" x="-2.54" y="48.26" size="1.778" layer="96" rot="R90"/>
 <attribute name="NAME" x="-13.462" y="48.26" size="1.778" layer="95" rot="R90"/>
 </instance>
-<instance part="UART_CON" gate="G$1" x="-17.78" y="27.94" smashed="yes">
+<instance part="UART" gate="G$1" x="-17.78" y="27.94" smashed="yes">
 <attribute name="VALUE" x="-20.32" y="22.86" size="1.778" layer="96"/>
 <attribute name="NAME" x="-20.32" y="33.782" size="1.778" layer="95"/>
 </instance>
@@ -4679,7 +4679,7 @@ CONN_04
 <instance part="GND21" gate="1" x="-101.6" y="63.5" smashed="yes" rot="R270">
 <attribute name="VALUE" x="-104.14" y="66.04" size="1.778" layer="96" rot="R270"/>
 </instance>
-<instance part="I2C_CON" gate="G$1" x="38.1" y="27.94" smashed="yes">
+<instance part="I2C" gate="G$1" x="38.1" y="27.94" smashed="yes">
 <attribute name="VALUE" x="33.02" y="20.574" size="1.778" layer="96" font="vector"/>
 <attribute name="NAME" x="33.02" y="36.068" size="1.778" layer="95" font="vector"/>
 </instance>
@@ -4727,7 +4727,7 @@ CONN_04
 <wire x1="0" y1="101.6" x2="10.16" y2="101.6" width="0.1524" layer="91"/>
 <wire x1="0" y1="50.8" x2="0" y2="58.42" width="0.1524" layer="91"/>
 <junction x="0" y="73.66"/>
-<pinref part="BA_CON" gate="G$1" pin="1"/>
+<pinref part="BAT" gate="G$1" pin="1"/>
 <wire x1="0" y1="58.42" x2="0" y2="73.66" width="0.1524" layer="91"/>
 <wire x1="-7.62" y1="58.42" x2="0" y2="58.42" width="0.1524" layer="91"/>
 <junction x="0" y="58.42"/>
@@ -4737,35 +4737,35 @@ CONN_04
 </segment>
 <segment>
 <pinref part="GND5" gate="1" pin="GND"/>
-<pinref part="S_E4" gate="G$1" pin="1"/>
+<pinref part="E4" gate="G$1" pin="1"/>
 </segment>
 <segment>
 <pinref part="GND8" gate="1" pin="GND"/>
-<pinref part="S_E3" gate="G$1" pin="1"/>
+<pinref part="E3" gate="G$1" pin="1"/>
 </segment>
 <segment>
 <pinref part="GND9" gate="1" pin="GND"/>
-<pinref part="S_C4" gate="G$1" pin="1"/>
+<pinref part="C4" gate="G$1" pin="1"/>
 </segment>
 <segment>
 <pinref part="GND10" gate="1" pin="GND"/>
-<pinref part="S_C3" gate="G$1" pin="1"/>
+<pinref part="C3" gate="G$1" pin="1"/>
 </segment>
 <segment>
 <pinref part="GND11" gate="1" pin="GND"/>
-<pinref part="S_E1" gate="G$1" pin="1"/>
+<pinref part="E1" gate="G$1" pin="1"/>
 </segment>
 <segment>
 <pinref part="GND12" gate="1" pin="GND"/>
-<pinref part="S_E2" gate="G$1" pin="1"/>
+<pinref part="E2" gate="G$1" pin="1"/>
 </segment>
 <segment>
 <pinref part="GND13" gate="1" pin="GND"/>
-<pinref part="S_C1" gate="G$1" pin="1"/>
+<pinref part="C1" gate="G$1" pin="1"/>
 </segment>
 <segment>
 <pinref part="GND14" gate="1" pin="GND"/>
-<pinref part="S_C2" gate="G$1" pin="1"/>
+<pinref part="C2" gate="G$1" pin="1"/>
 </segment>
 <segment>
 <pinref part="U$2" gate="G$1" pin="GND@8"/>
@@ -4801,12 +4801,12 @@ CONN_04
 <pinref part="GND21" gate="1" pin="GND"/>
 </segment>
 <segment>
-<pinref part="UART_CON" gate="G$1" pin="3"/>
+<pinref part="UART" gate="G$1" pin="3"/>
 <wire x1="-12.7" y1="30.48" x2="10.16" y2="30.48" width="0.1524" layer="91"/>
 <label x="7.62" y="30.48" size="1.778" layer="95"/>
 </segment>
 <segment>
-<pinref part="I2C_CON" gate="G$1" pin="4"/>
+<pinref part="I2C" gate="G$1" pin="4"/>
 <wire x1="43.18" y1="33.02" x2="48.26" y2="33.02" width="0.1524" layer="91"/>
 <label x="48.26" y="33.02" size="1.778" layer="95"/>
 </segment>
@@ -4821,7 +4821,7 @@ CONN_04
 <segment>
 <pinref part="P+1" gate="1" pin="+12V"/>
 <wire x1="-20.32" y1="50.8" x2="-20.32" y2="58.42" width="0.1524" layer="91"/>
-<pinref part="BA_CON" gate="G$1" pin="2"/>
+<pinref part="BAT" gate="G$1" pin="2"/>
 <wire x1="-10.16" y1="58.42" x2="-20.32" y2="58.42" width="0.1524" layer="91"/>
 <junction x="-20.32" y="58.42"/>
 <wire x1="-20.32" y1="58.42" x2="-20.32" y2="83.82" width="0.1524" layer="91"/>
@@ -4840,7 +4840,7 @@ CONN_04
 <net name="SE1" class="0">
 <segment>
 <wire x1="10.16" y1="17.78" x2="-58.42" y2="17.78" width="0.1524" layer="91"/>
-<pinref part="S_E1" gate="G$1" pin="3"/>
+<pinref part="E1" gate="G$1" pin="3"/>
 <wire x1="-58.42" y1="17.78" x2="-66.04" y2="12.7" width="0.1524" layer="91"/>
 <label x="12.7" y="17.78" size="1.778" layer="95"/>
 </segment>
@@ -4853,7 +4853,7 @@ CONN_04
 <net name="SC1" class="0">
 <segment>
 <wire x1="10.16" y1="15.24" x2="-58.42" y2="15.24" width="0.1524" layer="91"/>
-<pinref part="S_C1" gate="G$1" pin="3"/>
+<pinref part="C1" gate="G$1" pin="3"/>
 <wire x1="-58.42" y1="15.24" x2="-66.04" y2="27.94" width="0.1524" layer="91"/>
 <label x="12.7" y="15.24" size="1.778" layer="95"/>
 </segment>
@@ -4865,7 +4865,7 @@ CONN_04
 </net>
 <net name="SE2" class="0">
 <segment>
-<pinref part="S_E2" gate="G$1" pin="3"/>
+<pinref part="E2" gate="G$1" pin="3"/>
 <wire x1="10.16" y1="12.7" x2="-38.1" y2="12.7" width="0.1524" layer="91"/>
 <label x="12.7" y="12.7" size="1.778" layer="95"/>
 </segment>
@@ -4878,7 +4878,7 @@ CONN_04
 <net name="SC2" class="0">
 <segment>
 <wire x1="-27.94" y1="10.16" x2="10.16" y2="10.16" width="0.1524" layer="91"/>
-<pinref part="S_C2" gate="G$1" pin="3"/>
+<pinref part="C2" gate="G$1" pin="3"/>
 <wire x1="-27.94" y1="10.16" x2="-38.1" y2="27.94" width="0.1524" layer="91"/>
 <label x="12.7" y="10.16" size="1.778" layer="95"/>
 </segment>
@@ -4893,7 +4893,7 @@ CONN_04
 <wire x1="-27.94" y1="7.62" x2="10.16" y2="7.62" width="0.1524" layer="91"/>
 <wire x1="-27.94" y1="7.62" x2="-27.94" y2="-17.78" width="0.1524" layer="91"/>
 <wire x1="-27.94" y1="-17.78" x2="-58.42" y2="-17.78" width="0.1524" layer="91"/>
-<pinref part="S_E3" gate="G$1" pin="3"/>
+<pinref part="E3" gate="G$1" pin="3"/>
 <wire x1="-58.42" y1="-17.78" x2="-66.04" y2="-22.86" width="0.1524" layer="91"/>
 <label x="12.7" y="7.62" size="1.778" layer="95"/>
 </segment>
@@ -4908,7 +4908,7 @@ CONN_04
 <wire x1="-25.4" y1="5.08" x2="10.16" y2="5.08" width="0.1524" layer="91"/>
 <wire x1="-25.4" y1="5.08" x2="-25.4" y2="-20.32" width="0.1524" layer="91"/>
 <wire x1="-25.4" y1="-20.32" x2="-58.42" y2="-20.32" width="0.1524" layer="91"/>
-<pinref part="S_C3" gate="G$1" pin="3"/>
+<pinref part="C3" gate="G$1" pin="3"/>
 <wire x1="-58.42" y1="-20.32" x2="-66.04" y2="-7.62" width="0.1524" layer="91"/>
 <label x="12.7" y="5.08" size="1.778" layer="95"/>
 </segment>
@@ -4922,7 +4922,7 @@ CONN_04
 <segment>
 <wire x1="-22.86" y1="2.54" x2="10.16" y2="2.54" width="0.1524" layer="91"/>
 <wire x1="-22.86" y1="2.54" x2="-22.86" y2="-22.86" width="0.1524" layer="91"/>
-<pinref part="S_E4" gate="G$1" pin="3"/>
+<pinref part="E4" gate="G$1" pin="3"/>
 <wire x1="-22.86" y1="-22.86" x2="-38.1" y2="-22.86" width="0.1524" layer="91"/>
 <label x="12.7" y="2.54" size="1.778" layer="95"/>
 </segment>
@@ -4937,7 +4937,7 @@ CONN_04
 <wire x1="-20.32" y1="0" x2="10.16" y2="0" width="0.1524" layer="91"/>
 <wire x1="-20.32" y1="0" x2="-20.32" y2="-25.4" width="0.1524" layer="91"/>
 <wire x1="-20.32" y1="-25.4" x2="-27.94" y2="-25.4" width="0.1524" layer="91"/>
-<pinref part="S_C4" gate="G$1" pin="3"/>
+<pinref part="C4" gate="G$1" pin="3"/>
 <wire x1="-27.94" y1="-25.4" x2="-38.1" y2="-7.62" width="0.1524" layer="91"/>
 <label x="12.7" y="0" size="1.778" layer="95"/>
 </segment>
@@ -4949,17 +4949,17 @@ CONN_04
 </net>
 <net name="5VA" class="1">
 <segment>
-<pinref part="S_E4" gate="G$1" pin="2"/>
+<pinref part="E4" gate="G$1" pin="2"/>
 <wire x1="-38.1" y1="-25.4" x2="-33.02" y2="-25.4" width="0.1524" layer="91"/>
 <wire x1="-33.02" y1="-25.4" x2="-33.02" y2="-10.16" width="0.1524" layer="91"/>
-<pinref part="S_C4" gate="G$1" pin="2"/>
+<pinref part="C4" gate="G$1" pin="2"/>
 <wire x1="-33.02" y1="-10.16" x2="-33.02" y2="0" width="0.1524" layer="91"/>
 <wire x1="-38.1" y1="-10.16" x2="-33.02" y2="-10.16" width="0.1524" layer="91"/>
 <junction x="-33.02" y="-10.16"/>
-<pinref part="S_C3" gate="G$1" pin="2"/>
+<pinref part="C3" gate="G$1" pin="2"/>
 <wire x1="-66.04" y1="-10.16" x2="-55.88" y2="-10.16" width="0.1524" layer="91"/>
 <wire x1="-55.88" y1="-10.16" x2="-55.88" y2="0" width="0.1524" layer="91"/>
-<pinref part="S_E3" gate="G$1" pin="2"/>
+<pinref part="E3" gate="G$1" pin="2"/>
 <wire x1="-66.04" y1="-25.4" x2="-55.88" y2="-25.4" width="0.1524" layer="91"/>
 <wire x1="-55.88" y1="-25.4" x2="-55.88" y2="-10.16" width="0.1524" layer="91"/>
 <junction x="-55.88" y="-10.16"/>
@@ -4981,7 +4981,7 @@ CONN_04
 </net>
 <net name="RX" class="0">
 <segment>
-<pinref part="UART_CON" gate="G$1" pin="1"/>
+<pinref part="UART" gate="G$1" pin="1"/>
 <wire x1="-12.7" y1="25.4" x2="10.16" y2="25.4" width="0.1524" layer="91"/>
 <label x="7.62" y="25.4" size="1.778" layer="95"/>
 </segment>
@@ -4993,7 +4993,7 @@ CONN_04
 </net>
 <net name="TX" class="0">
 <segment>
-<pinref part="UART_CON" gate="G$1" pin="2"/>
+<pinref part="UART" gate="G$1" pin="2"/>
 <wire x1="-12.7" y1="27.94" x2="10.16" y2="27.94" width="0.1524" layer="91"/>
 <label x="7.62" y="27.94" size="1.778" layer="95"/>
 </segment>
@@ -5015,7 +5015,7 @@ CONN_04
 <label x="-33.02" y="111.76" size="1.778" layer="95"/>
 </segment>
 <segment>
-<pinref part="UART_CON" gate="G$1" pin="4"/>
+<pinref part="UART" gate="G$1" pin="4"/>
 <wire x1="-12.7" y1="33.02" x2="10.16" y2="33.02" width="0.1524" layer="91"/>
 <label x="7.62" y="33.02" size="1.778" layer="95"/>
 </segment>
@@ -5032,7 +5032,7 @@ CONN_04
 </net>
 <net name="I2C_VCC" class="2">
 <segment>
-<pinref part="I2C_CON" gate="G$1" pin="3"/>
+<pinref part="I2C" gate="G$1" pin="3"/>
 <label x="48.26" y="30.48" size="1.778" layer="95"/>
 <wire x1="43.18" y1="30.48" x2="83.82" y2="30.48" width="0.1524" layer="91"/>
 <pinref part="VCC_SEL" gate="G$1" pin="2"/>
@@ -5040,7 +5040,7 @@ CONN_04
 </net>
 <net name="I2C_SCL" class="0">
 <segment>
-<pinref part="I2C_CON" gate="G$1" pin="2"/>
+<pinref part="I2C" gate="G$1" pin="2"/>
 <wire x1="43.18" y1="27.94" x2="48.26" y2="27.94" width="0.1524" layer="91"/>
 <label x="48.26" y="27.94" size="1.778" layer="95"/>
 </segment>
@@ -5052,7 +5052,7 @@ CONN_04
 </net>
 <net name="I2C_SDA" class="0">
 <segment>
-<pinref part="I2C_CON" gate="G$1" pin="1"/>
+<pinref part="I2C" gate="G$1" pin="1"/>
 <wire x1="43.18" y1="25.4" x2="48.26" y2="25.4" width="0.1524" layer="91"/>
 <label x="48.26" y="25.4" size="1.778" layer="95"/>
 </segment>
@@ -5088,10 +5088,10 @@ CONN_04
 <label x="66.04" y="139.7" size="1.778" layer="95"/>
 </segment>
 <segment>
-<pinref part="S_C2" gate="G$1" pin="2"/>
-<pinref part="S_C1" gate="G$1" pin="2"/>
+<pinref part="C2" gate="G$1" pin="2"/>
+<pinref part="C1" gate="G$1" pin="2"/>
 <wire x1="-66.04" y1="25.4" x2="-55.88" y2="25.4" width="0.1524" layer="91"/>
-<pinref part="S_E1" gate="G$1" pin="2"/>
+<pinref part="E1" gate="G$1" pin="2"/>
 <wire x1="-66.04" y1="10.16" x2="-55.88" y2="10.16" width="0.1524" layer="91"/>
 <wire x1="-55.88" y1="10.16" x2="-55.88" y2="25.4" width="0.1524" layer="91"/>
 <junction x="-55.88" y="25.4"/>
@@ -5099,7 +5099,7 @@ CONN_04
 <wire x1="-55.88" y1="40.64" x2="-33.02" y2="40.64" width="0.1524" layer="91"/>
 <wire x1="-33.02" y1="40.64" x2="-33.02" y2="25.4" width="0.1524" layer="91"/>
 <wire x1="-33.02" y1="25.4" x2="-38.1" y2="25.4" width="0.1524" layer="91"/>
-<pinref part="S_E2" gate="G$1" pin="2"/>
+<pinref part="E2" gate="G$1" pin="2"/>
 <wire x1="-38.1" y1="10.16" x2="-33.02" y2="10.16" width="0.1524" layer="91"/>
 <wire x1="-33.02" y1="10.16" x2="-33.02" y2="25.4" width="0.1524" layer="91"/>
 <junction x="-33.02" y="25.4"/>
