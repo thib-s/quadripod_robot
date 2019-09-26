@@ -22,6 +22,7 @@ class ServoController():
             # pins = [16, 20, 21, 26, 19, 13, 6, 5]
             # pins = [21, 26, 16, 20,6, 5, 19, 13]
             pins = [6,5,19,13,21,26,16,20]
+            # pins = [5,6,13,19,26,21,20,16]
         # gpio ids of each servo
         self.pins = pins
 
@@ -31,9 +32,9 @@ class ServoController():
         for pin in self.pins:
             self.pi.set_mode(pin, pigpio.OUTPUT)
         # start 1500 us servo pulses on gpio4
-        for pin in self.pins:
-            self.pi.set_servo_pulsewidth(pin, 1500)
-            time.sleep(0.25)
+        #for pin in self.pins:
+        #    self.pi.set_servo_pulsewidth(pin, 1500)
+        #    time.sleep(0.25)
 
     def move(self, position_sequence, correction, delay_step=0.25, delay_serv=0.0):
         for step in position_sequence:
@@ -61,12 +62,12 @@ class QuadripodModel():
         ################################################
 
         # how much to raise the legs when walking
-        self.delta = 20
+        self.delta = 15
 
         self.init_angles = np.array(
             [[90, 90 + self.delta, 90, 90 - self.delta, 90, 90 - self.delta, 90, 90 + self.delta]])
         # values to correct mechanical alignment of servos
-        self.corrections = np.array([-20, 10, 20, 0, 20, 20, -20, 0])
+        self.corrections = np.array([-20, 20, 20, -10, 20, 0, -20, 25])
 
         # how to affect the values when moving the body without walking
         # body_p* refers to position
@@ -97,22 +98,22 @@ class QuadripodModel():
         rotation
         :return: the sequence of the servos position as np array
         """
-        linear = 0.5 * twist.linear.y + 0.5
+        linear = 0.5 * twist.linear.x + 0.5
         angular = 0.5 * twist.angular.z + 0.5
         linear_sequence = np.array([
-            [75, 90, 70, 90 - self.delta, 110, 90 - self.delta, 105, 90],
-            [75, 90 + self.delta, 70, 90, 110, 90, 105, 90 + self.delta],
-            [110, 90 + self.delta, 110, 90, 75, 90, 60, 90 + self.delta],
-            [110, 90, 110, 90 - self.delta, 75, 90 - self.delta, 60, 90]
+            [75 , 90 - self.delta, 70,  90 - self.delta, 110, 90 - self.delta, 105, 90 - self.delta],
+            [75,  90 + self.delta, 70,  90 + self.delta, 110, 90 + self.delta, 105, 90 + self.delta],
+            [110, 90 + self.delta, 110, 90 + self.delta, 75,  90 + self.delta, 60 , 90 + self.delta],
+            [110, 90 - self.delta, 110, 90 - self.delta, 75,  90 - self.delta, 60 , 90 - self.delta]
         ])
         angular_sequence = np.array([
-            [110, 90, 70, 90 - self.delta, 75, 90 - self.delta, 105, 90],
-            [110, 90 + self.delta, 70, 90, 75, 90, 105, 90 + self.delta],
-            [75, 90 + self.delta, 110, 90, 110, 90, 60, 90 + self.delta],
-            [75, 90, 110, 90 - self.delta, 110, 90 - self.delta, 60, 90]
+            [110, 90 - self.delta, 70,  90 - self.delta, 75 , 90 - self.delta, 105, 90 - self.delta],
+            [110, 90 + self.delta, 70,  90 + self.delta, 75 , 90 + self.delta, 105, 90 + self.delta],
+            [75,  90 + self.delta, 110, 90 + self.delta, 110, 90 + self.delta, 60 , 90 + self.delta],
+            [75,  90 - self.delta, 110, 90 - self.delta, 110, 90 - self.delta, 60 , 90 - self.delta]
         ])
         return 0.5 * ((linear * linear_sequence) + (1 - linear) * linear_sequence[::-1]) \
-               + 0.5 * ((angular * angular_sequence) + (1 - angular) * angular_sequence[::1])
+               + 0.5 * ((angular * angular_sequence) + (1 - angular) * angular_sequence[::-1])
 
     def compute_pose(self):
         """
@@ -142,21 +143,21 @@ if __name__ == '__main__':
     controller = ServoController()
     quadripod = QuadripodModel()
     # move the legs to initial position
-    controller.move(quadripod.init_angles, quadripod.corrections, 1., 1.)
+    controller.move(quadripod.init_angles, quadripod.corrections, 0., 0.25)
 
     def move_callback(twist):
-        if (abs(twist.linear.y) > 0.05) and (abs(twist.angular.z) > 0.05):
+        rospy.loginfo("move callback called")
+        if (abs(twist.linear.x) > 0.05) or (abs(twist.angular.z) > 0.05):
+            rospy.loginfo("got move over threshold")
             walk_sequence = quadripod.walk(twist)
             body_pose = quadripod.compute_pose()
             # todo: replace controller.move by msg emission
-            controller.move(walk_sequence, body_pose + quadripod.corrections)
+            controller.move(walk_sequence, body_pose + quadripod.corrections, .200, 0.)
         else:
+            rospy.loginfo("got move under threshold")
             controller.move(quadripod.init_angles, quadripod.corrections)
-
 
     rospy.Subscriber("/cmd_vel", Twist, move_callback, queue_size=1)
     rospy.Subscriber("/body_pose", Twist, quadripod.set_body_twist, queue_size=1)
-    # todo add rospy shutdown handler
-    # rospy.spin()
-    time.sleep(10)
-    controller.release()
+    rospy.on_shutdown(controller.release)
+    rospy.spin()
