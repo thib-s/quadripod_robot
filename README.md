@@ -1,5 +1,5 @@
 
-![alt text](https://github.com/thib-s/quadripod_robot/raw/master/visuals/logo/tbot-logo.svg)
+![alt text](https://github.com/thib-s/quadripod_robot/raw/master/visuals/logo/tbot-logo.png)
 
 Quadripod robot
 ===================
@@ -29,4 +29,4 @@ Contains the eagle files for the pcb manufacturing.
 code
 ----
 
-Contains the code to set up and run the robot. It is splitten in two parts: the ros nodes in the ros\_node folder, the 	test\_quadri (to be renamed ) contains the code that configure and perform the gait. Test\_servo folder contain code to check if the servos are well wired and the joint correctly set.
+Contains the code that runs on the raspberry pi zero. The folder catkin\_ws contains the node to run locally on the robot. The folder camera\_calibration contains the files to calibrate the camera. The folder teleop\_ws contains the nodes to control the robot remotely using a joystick.
