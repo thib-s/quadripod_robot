@@ -23,9 +23,9 @@ def warp_constant_TRR(img):
 class image_converter:
 
     def __init__(self):
-        self.image_pub = rospy.Publisher("/plannar_cam/image", Image)
-        self.angle_pub = rospy.Publisher("/plannar_cam/theta", Float32)
-        self.delta_pub = rospy.Publisher("/plannar_cam/delta", Float32)
+        self.image_pub = rospy.Publisher("/plannar_cam/image", Image, queue_size=1)
+        self.angle_pub = rospy.Publisher("/plannar_cam/theta", Float32, queue_size=1)
+        self.delta_pub = rospy.Publisher("/plannar_cam/delta", Float32, queue_size=1)
 
         self.bridge = CvBridge()
         self.image_sub = rospy.Subscriber("/raspicam_node/image", Image, self.callback)
@@ -50,21 +50,31 @@ class image_converter:
         # avg_angle = np.average(angles, weights=modules)
         values, bins = np.histogram(angles.flatten(), bins=np.arange(-np.pi * 0.5, +np.pi * 0.5, 0.05),
                                     weights=modules.flatten(), density=True)
+        # print("sum of modules (theta): %.2f" % modules.sum())
         # print(values)
         major_angle_idx = np.argmax(values)
         major_angle = 0.5 * (bins[major_angle_idx] + bins[major_angle_idx + 1])
         # print("angle: %.3f" % np.rad2deg(avg_angle))
-        print("major angle: %.3f" % np.rad2deg(major_angle))
-        return major_angle
+        if modules.sum() > 500000:
+            print("major angle: %.3f" % np.rad2deg(major_angle))
+            return major_angle
+        else:
+            print("houston, we lost the line")
+            return None
 
     @staticmethod
     def extract_delta(angles, modules):
         # pos_values, pos_bins = np.histogram(range(150), bins=range(150), weights=np.average(modules[-25:,:], axis=0), density=True)
         # major_pos_idx = np.argmax(pos_values)
-        major_pos_idx = np.average(range(150), weights=np.average(modules[-25:, :], axis=0))
+        major_pos_idx = np.average(range(150), weights=np.average(modules[-50:, :], axis=0))
         major_pos = (major_pos_idx - 75) / 5  # conversion en cm
-        print("major_pos : %.1f" % major_pos)
-        return major_pos
+        # print("sum of modules (delta): %.2f" % modules[-50:,:].sum())
+        if (modules[-50:, :].sum()) > 70000:
+            print("major_pos : %.1f" % major_pos)
+            return major_pos
+        else:
+            print("houston we lost the line end")
+            return None
 
     @staticmethod
     def display_vector_field(angles, modules):
@@ -82,8 +92,12 @@ class image_converter:
             cv_image = warp_constant_TRR(cv_image)
             bw_img = self.to_bw(cv_image)
             angles, modules = self.compute_gradients(bw_img)
-            self.delta_pub.publish(Float32(self.extract_delta(angles, modules)))
-            self.angle_pub.publish(Float32(self.extract_theta(angles, modules)))
+            delta = self.extract_delta(angles, modules)
+            if delta is not None:
+                self.delta_pub.publish(Float32(delta))
+            theta = self.extract_theta(angles, modules)
+            if theta is not None:
+                self.angle_pub.publish(Float32(theta))
             self.image_pub.publish(self.bridge.cv2_to_imgmsg(cv_image, "bgr8"))
         except CvBridgeError as e:
             print(e)
