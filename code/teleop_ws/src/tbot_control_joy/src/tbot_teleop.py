@@ -26,12 +26,12 @@ def talker():
             #    twist.angular.z = - twist.angular.z
             pub.publish(twist_mv)
             twist_pose = Twist()
-            twist_pose.angular.x = joy_value.axes[6] * 2
-            twist_pose.angular.y = joy_value.axes[5] * 2
+            twist_pose.angular.x = joy_value.axes[5] * 2
+            twist_pose.angular.y = joy_value.axes[6] * 2
             twist_pose.angular.z = (joy_value.buttons[4] - joy_value.buttons[5]) * 2
             
             twist_pose.linear.x = joy_value.axes[1] * 2
-            twist_pose.linear.y = joy_value.axes[0] * 2
+            twist_pose.linear.y = (joy_value.buttons[1] - joy_value.buttons[3]) * 2
             twist_pose.linear.z = (joy_value.buttons[6] - joy_value.buttons[7]) * 2
             pub_pose.publish(twist_pose)
         rospy.sleep(0.25)

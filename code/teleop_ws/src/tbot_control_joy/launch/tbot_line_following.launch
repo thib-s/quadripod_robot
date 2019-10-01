@@ -1,0 +1,12 @@
+<launch>
+
+    <node pkg="line_follower" type="LineFollower.py" name="line_follower" />
+    <node pkg="video_reprojection" type="video_reprojection.py" name="video_reprojection" />
+
+    <node pkg="image_transport" type="republish" name="republisher">
+        <param name="in" value="/raspicam_node/image"/>
+        <param name="in_transport" value="compressed"/>
+        <param name="out" value="/raspicam_node/image"/>
+        <param name="in_transport" value="raw"/>
+    </node>
+</launch>
