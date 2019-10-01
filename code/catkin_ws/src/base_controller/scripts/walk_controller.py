@@ -5,53 +5,7 @@
 import rospy
 from geometry_msgs.msg import Twist
 from base_controller.msg import MotionSequence
-import time
 import numpy as np
-# import pigpio
-
-deg2ms = lambda angle: (angle / 180.0) * 1000.0 + 1000.0
-
-
-# class ServoController():
-#
-#     def __init__(self, pins=None):
-#         """
-#         Initialize the servo and move them to the standby position
-#         :return: nothing
-#         """
-#         if pins is None:
-#             # pins = [16, 20, 21, 26, 19, 13, 6, 5]
-#             # pins = [21, 26, 16, 20,6, 5, 19, 13]
-#             pins = [6,5,19,13,21,26,16,20]
-#             # pins = [5,6,13,19,26,21,20,16]
-#         # gpio ids of each servo
-#         self.pins = pins
-#
-#         self.pi = pigpio.pi()  # Connect to local Pi.
-#
-#         # set gpio modes
-#         for pin in self.pins:
-#             self.pi.set_mode(pin, pigpio.OUTPUT)
-#         # start 1500 us servo pulses on gpio4
-#         #for pin in self.pins:
-#         #    self.pi.set_servo_pulsewidth(pin, 1500)
-#         #    time.sleep(0.25)
-#
-#     def move(self, position_sequence, correction, delay_step=0.25, delay_serv=0.0):
-#         for step in position_sequence:
-#             for i, pin in enumerate(self.pins):
-#                 self.pi.set_servo_pulsewidth(pin, deg2ms(step[i] + correction[i]))
-#                 time.sleep(delay_serv)
-#             time.sleep(delay_step)
-#
-#     def release(self):
-#         """
-#         release all servos and stop the deamon
-#         :return:
-#         """
-#         for pin in self.pins:
-#             self.pi.set_servo_pulsewidth(pin, 0)  # stop servo pulses
-#         self.pi.stop()  # terminate connection and release resources
 
 
 class QuadripodModel():
@@ -73,13 +27,13 @@ class QuadripodModel():
         # how to affect the values when moving the body without walking
         # body_p* refers to position
         # body_o* refers to orientation
-        self.body_pz = np.array([0, 1, 0, -1, 0, -1, 0, 1]) # ok
-        self.body_px = np.array([1, 0, -1, 0, 1, 0, -1, 0]) # ok
+        self.body_pz = np.array([0, 1, 0, -1, 0, -1, 0, 1])  # ok
+        self.body_px = np.array([1, 0, -1, 0, 1, 0, -1, 0])  # ok
         self.body_py = np.array([-1, 0, 1, 0, 1, 0, -1, 0])  # not py but spacing
         self.body_ox = np.array([0, -1, 0, -1, 0, 1, 0, 1])  # ok
-        self.body_oy = np.array([0, 1, 0, -1, 0, 1, 0, -1]) # ok
+        self.body_oy = np.array([0, 1, 0, -1, 0, 1, 0, -1])  # ok
         self.body_oz = np.array([1, 0, 1, 0, 1, 0, 1, 0])  # ok
-        self.gain = 10 # coefficient applied on body pose corrections
+        self.gain = 10  # coefficient applied on body pose corrections
 
         self.body_twist = Twist()
         self.body_twist.linear.x = 0.
@@ -151,7 +105,9 @@ if __name__ == '__main__':
     rospy.init_node('gait_controller', anonymous=False)
     # controller = ServoController()
     quadripod = QuadripodModel()
-    pub = rospy.Publisher('/motionsequence', MotionSequence, queue_size=1)
+    pub = rospy.Publisher(rospy.get_param("~motionsequence_topic", '/motionsequence'), MotionSequence, queue_size=1)
+    default_step_delay = rospy.get_param("~default_step_delay", 0.200)
+    default_serv_delay = rospy.get_param("~default_serv_delay", 0.)
 
     def move_callback(twist):
         rospy.loginfo("move callback called")
@@ -163,20 +119,19 @@ if __name__ == '__main__':
             # todo: replace controller.move by msg emission
             msg.positions = positions.flatten().astype(np.uint16)
             msg.correction = body_pose.astype(np.int16)
-            msg.step_delay = 0.200
-            msg.serv_delay = 0.
+            msg.step_delay = default_step_delay
+            msg.serv_delay = default_serv_delay
         else:
             rospy.loginfo("got move under threshold")
             # positions[-1, :] = quadripod.init_angles.astype(np.uint16)
             msg.positions = quadripod.init_angles.flatten().astype(np.uint8)
             msg.correction = body_pose.astype(np.int16)
             msg.step_delay = 0.
-            msg.serv_delay = 0.
+            msg.serv_delay = default_serv_delay
         pub.publish(msg)
 
-    rospy.Subscriber("/cmd_vel", Twist, move_callback, queue_size=1)
-    rospy.Subscriber("/body_pose", Twist, quadripod.set_body_twist, queue_size=1)
-    # rospy.on_shutdown(controller.release)
+    rospy.Subscriber(rospy.get_param("~cmd_vel_topic", "/cmd_vel"), Twist, move_callback, queue_size=1)
+    rospy.Subscriber(rospy.get_param("~body_pose_topic", "/body_pose"), Twist, quadripod.set_body_twist, queue_size=1)
 
     # move the legs to initial position
     # controller.move(quadripod.init_angles, quadripod.corrections, 0., 0.25)
