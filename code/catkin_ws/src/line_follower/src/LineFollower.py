@@ -14,8 +14,8 @@ class LineFollower():
         self.smoothing_coef = 0.75  # good at v=1.5
         self.delta_sub = rospy.Subscriber("/plannar_cam/delta", Float32, self.delta_callback)
         self.theta_sub = rospy.Subscriber("/plannar_cam/theta", Float32, self.theta_callback)
-        self.delta_coef = -0.05
-        self.theta_coef = .15
+        self.delta_coef = 0.05
+        self.theta_coef = 0.#.15
 
     def theta_callback(self, msg):
         self.theta = (1-self.smoothing_coef) * self.theta + self.smoothing_coef * msg.data
@@ -34,7 +34,7 @@ def main(args):
     while not rospy.is_shutdown():
         try:
             msg = Twist()
-            msg.linear.x = 2
+            msg.linear.x = 1
             desired = controller.delta_coef * controller.delta +\
                       controller.theta_coef * controller.theta
             msg.angular.z = min(1., max(-1., desired))
