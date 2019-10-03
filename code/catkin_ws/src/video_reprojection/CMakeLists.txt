@@ -3,7 +3,8 @@ project(video_reprojection)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 add_compile_options(-std=c++11)
-set(OpenCV_DIR /usr/share/OpenCV/)
+# set(OpenCV_DIR /usr/share/OpenCV/)
+set(OpenCV_DIR /opt/ros/kinetic/share/OpenCV-3.3.1-dev/)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
@@ -139,7 +140,7 @@ include_directories(
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-add_executable(${PROJECT_NAME}_node src/video_reprojection_node.cpp)
+add_executable(video_reprojection_node src/video_reprojection_node.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the

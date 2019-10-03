@@ -181,7 +181,7 @@ install(FILES
   launch/jacob_bringup.launch
   launch/tbot_cam.launch
   launch/tbot_vision_test.launch
-  launch/tbot_vision_line_following.launch
+  launch/tbot_line_following.launch
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
 

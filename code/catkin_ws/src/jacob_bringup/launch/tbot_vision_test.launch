@@ -3,7 +3,9 @@
     <include file="$(find jacob_bringup)/launch/tbot_cam.launch"/>
 
     <node pkg="line_follower" type="LineFollower.py" name="line_follower"/>
-    <node pkg="video_reprojection" type="video_reprojection_node" name="video_reprojection" output="screen"/>
+    <node pkg="video_reprojection" type="video_reprojection_node" name="video_reprojection" output="screen">
+    <param name="image_transport" value="compressed" />
+    </node>
 
 
 </launch>

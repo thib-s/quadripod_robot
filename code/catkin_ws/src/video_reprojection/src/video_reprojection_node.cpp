@@ -6,10 +6,11 @@
 #include <sensor_msgs/image_encodings.h>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
+#include "std_msgs/Float32.h"
 #include <stdio.h>
 
-static const std::string OPENCV_WINDOW = "Image window";
-static const std::string OPENCV_WINDOW2 = "Image window 2";
+//static const std::string OPENCV_WINDOW = "Image window";
+//static const std::string OPENCV_WINDOW2 = "Image window 2";
 #define WIDTH 300
 #define HEIGHT 250
 
@@ -26,13 +27,16 @@ class ImageConverter {
   ros::NodeHandle nh_;
   image_transport::ImageTransport it_;
   image_transport::Subscriber image_sub_;
-  image_transport::Publisher image_pub_;
+//  image_transport::Publisher image_pub_;
+  ros::Publisher delta_pub;
   Mat src_gray, src_warp, src_smoothed;
   Mat grad_x, grad_y, abs_grad_x, abs_grad_y, angles, magnitude;
   int scale = 1;
-  int delta = 0;
+  int d = 0;
   int ddepth = CV_16S;
+  int sum, lum, lumsum;
   float mean_angle, mean_magnitude;
+  float delta;
 
 public:
     ImageConverter() : it_(nh_) //c++11 syntax (call it_(nh_) prior to this func )
@@ -40,20 +44,21 @@ public:
 //        cv::startWindowThread();
 //        image_transport::ImageTransport it_(nh_);
 	    this->image_sub_ = it_.subscribe("/raspicam_node/image", 1, &ImageConverter::imageCallback, this);
-	    this->image_pub_ = it_.advertise("/plannar_cam/image", 1);
+	    this->delta_pub = nh_.advertise<std_msgs::Float32>("/plannar_cam/delta", 1);
+//	    this->image_pub_ = it_.advertise("/plannar_cam/image", 1);
 //        // Subscrive to input video feed and publish output video feed
 //        image_sub_ = it_.subscribe("/camera/image_raw", 1,
 //        &ImageConverter::imageCb, this);
 //        image_pub_ = it_.advertise("/image_converter/output_video", 1);
 
-        cv::namedWindow(OPENCV_WINDOW);
-        cv::namedWindow(OPENCV_WINDOW2);
+//        cv::namedWindow(OPENCV_WINDOW);
+//        cv::namedWindow(OPENCV_WINDOW2);
     }
 
 
     ~ImageConverter()
     {
-    cv::destroyWindow(OPENCV_WINDOW);
+//    cv::destroyWindow(OPENCV_WINDOW);
     }
 
     void imageCallback(const sensor_msgs::ImageConstPtr& msg)
@@ -67,14 +72,14 @@ public:
             medianBlur(src_warp, src_smoothed, 11);
             src_smoothed.convertTo(src_smoothed, CV_64F);
             src_smoothed /= 255.0;
-            Sobel( src_smoothed, grad_x, ddepth, 1, 0, 5, scale, delta, BORDER_DEFAULT);
+            Sobel( src_smoothed, grad_x, ddepth, 1, 0, 5, scale, d, BORDER_DEFAULT);
             convertScaleAbs( grad_x, abs_grad_x );
-            Sobel( src_smoothed, grad_y, ddepth, 0, 1, 5, scale, delta, BORDER_DEFAULT);
+            Sobel( src_smoothed, grad_y, ddepth, 0, 1, 5, scale, d, BORDER_DEFAULT);
             convertScaleAbs( grad_y, abs_grad_y );
             addWeighted( abs_grad_x, 0.5, abs_grad_y, 0.5, 0, magnitude );
-            int sum = 0;
-            int lumsum = 0;
-            int lum;
+            sum = 0;
+            lumsum = 0;
+            lum;
             for (int i = 200; i < magnitude.rows; ++i)
             {
                 uchar* pixel = magnitude.ptr<uchar>(i);
@@ -85,6 +90,7 @@ public:
                     lumsum += lum;
                 }
             }
+            delta = (float)(sum)/((float)(lumsum)*5.);
             printf("res is %.3f \n", (float)(sum)/(float)(lumsum));
 //            cartToPolar( grad_x, grad_y, magnitude, angles);
 
@@ -94,13 +100,16 @@ public:
             ROS_ERROR("cv_bridge exception: %s", e.what());
             return;
         }
-        magnitude *= 255;
-        magnitude.convertTo(magnitude, CV_8U);
-         cv::imshow(OPENCV_WINDOW, magnitude);
-         cv::imshow(OPENCV_WINDOW2, src_smoothed);
-         cv::waitKey(3);
+//        magnitude *= 255;
+//        magnitude.convertTo(magnitude, CV_8U);
+//         cv::imshow(OPENCV_WINDOW, magnitude);
+//         cv::imshow(OPENCV_WINDOW2, src_smoothed);
+//         cv::waitKey(3);
          //cv_ptr->image = grad;
-         this->image_pub_.publish(cv_ptr->toImageMsg());
+//         this->image_pub_.publish(cv_ptr->toImageMsg());
+        std_msgs::Float32 msg_delta;
+        msg_delta.data = delta;
+        this->delta_pub.publish(msg_delta);
     }
 
 };
