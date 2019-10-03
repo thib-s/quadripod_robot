@@ -4,21 +4,25 @@ import rospy
 from sensor_msgs.msg import Joy
 from geometry_msgs.msg import Twist
 
-last_joy = -1e10
 joy_value = None
+joy_enabled = True
+enable_button_lastval = True
 
 def joy_cb(value):
-    global joy_value
+    global joy_value, joy_enabled, enable_button_lastval
     joy_value = value
+    if (value.buttons[9] == 1) and (enable_button_lastval == 0):
+        joy_enabled = not joy_enabled
+    enable_button_lastval = value.buttons[9]
 
 def talker():
     global joy_value
     rospy.init_node('tbot_teleop')
     sub = rospy.Subscriber('/joy', Joy, joy_cb)
-    pub = rospy.Publisher('/cmd_vel', Twist, queue_size=1)
+    pub = rospy.Publisher('/joy_vel', Twist, queue_size=1)
     pub_pose = rospy.Publisher("/body_pose", Twist, queue_size=1)
     while not rospy.is_shutdown():
-        if joy_value is not None:
+        if (joy_value is not None) and joy_enabled:
             twist_mv = Twist()
             twist_mv.linear.x = joy_value.axes[2]
             twist_mv.angular.z = joy_value.axes[3]
