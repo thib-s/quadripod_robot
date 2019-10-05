@@ -11,13 +11,13 @@ class LineFollower():
     def __init__(self):
         self.delta = 0.
         self.theta = 0.
-        self.speed = 1.
+        self.speed = 2.
         self.smoothing_coef = 0.75  # good at v=1.5
         self.delta_sub = rospy.Subscriber("/plannar_cam/delta", Float32, self.delta_callback)
         self.theta_sub = rospy.Subscriber("/plannar_cam/theta", Float32, self.theta_callback)
         # self.start_sub = rospy.Subscriber("/pause", Bool, self.start_callback)
         self.delta_coef = 0.05
-        self.theta_coef = 0.#.15
+        self.theta_coef = 0.15
 
     def theta_callback(self, msg):
         self.theta = (1-self.smoothing_coef) * self.theta + self.smoothing_coef * msg.data
@@ -33,9 +33,9 @@ def main(args):
     rospy.init_node('line_follower', anonymous=False)
     vel_pub = rospy.Publisher("/nav_vel", Twist, queue_size=1)
     controller = LineFollower()
-    vel_pub.publish(Twist())
-    rate = rospy.Rate(2)
-    rospy.sleep(5)
+    # vel_pub.publish(Twist())
+    rate = rospy.Rate(3)
+    # rospy.sleep(5)
     while not rospy.is_shutdown():
         try:
             msg = Twist()

@@ -2,9 +2,9 @@
 
     <include file="$(find jacob_bringup)/launch/tbot_cam.launch"/>
 
-    <node pkg="base_controller" type="walk_controller.py" name="gait_controller" output="screen">
+    <node pkg="base_controller" type="walk_controller.py" name="gait_controller">
     </node>
-    <node pkg="base_controller" type="servo_controller.py" name="servo_controller" output="screen">
+    <node pkg="base_controller" type="servo_controller.py" name="servo_controller">
     </node>
 
     <arg name="cmd_vel_out" default="/cmd_vel"/>

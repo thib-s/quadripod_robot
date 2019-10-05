@@ -3,7 +3,7 @@ project(video_reprojection)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 add_compile_options(-std=c++11)
-# set(OpenCV_DIR /usr/share/OpenCV/)
+#set(OpenCV_DIR /usr/share/OpenCV/)
 set(OpenCV_DIR /opt/ros/kinetic/share/OpenCV-3.3.1-dev/)
 
 ## Find catkin macros and libraries

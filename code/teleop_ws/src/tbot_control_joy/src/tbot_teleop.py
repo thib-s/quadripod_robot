@@ -3,6 +3,7 @@ import roslib#; roslib.load_manifest('vrep_ros_teleop')
 import rospy
 from sensor_msgs.msg import Joy
 from geometry_msgs.msg import Twist
+from std_msgs.msg import Bool
 
 joy_value = None
 joy_enabled = True
@@ -20,6 +21,7 @@ def talker():
     rospy.init_node('tbot_teleop')
     sub = rospy.Subscriber('/joy', Joy, joy_cb)
     pub = rospy.Publisher('/joy_vel', Twist, queue_size=1)
+    pub_pause = rospy.Publisher('/pause', Bool, queue_size=1)
     pub_pose = rospy.Publisher("/body_pose", Twist, queue_size=1)
     while not rospy.is_shutdown():
         if (joy_value is not None) and joy_enabled:
@@ -29,6 +31,7 @@ def talker():
             #if twist.linear.x < 0:
             #    twist.angular.z = - twist.angular.z
             pub.publish(twist_mv)
+
             twist_pose = Twist()
             twist_pose.angular.x = joy_value.axes[5] * 2
             twist_pose.angular.y = joy_value.axes[6] * 2
@@ -39,6 +42,7 @@ def talker():
             twist_pose.linear.z = (joy_value.buttons[6] - joy_value.buttons[7]) * 2
             pub_pose.publish(twist_pose)
         rospy.sleep(0.25)
+        pub_pause.publish(Bool(joy_enabled))  # tell the mux that we're alive
 
 
 if __name__ == '__main__':

@@ -22,7 +22,7 @@ class QuadripodModel():
         self.init_angles = np.array(
             [[90, 90 + self.delta, 90, 90 - self.delta, 90, 90 - self.delta, 90, 90 + self.delta]])
         # values to correct mechanical alignment of servos
-        self.corrections = np.array([-20, 40, 20, -30, 20, -20, -20, 40])
+        self.corrections = np.array([-20, 60, 20, -50, 20, -40, -20, 60])
 
         # how to affect the values when moving the body without walking
         # body_p* refers to position

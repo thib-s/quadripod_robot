@@ -29,14 +29,20 @@ class ImageConverter {
   image_transport::Subscriber image_sub_;
 //  image_transport::Publisher image_pub_;
   ros::Publisher delta_pub;
+//  cv_bridge::CvImageConstPtr cv_ptr;
+  cv_bridge::CvImagePtr cv_ptr;
   Mat src_gray, src_warp, src_smoothed;
   Mat grad_x, grad_y, abs_grad_x, abs_grad_y, angles, magnitude;
   int scale = 1;
   int d = 0;
   int ddepth = CV_16S;
   int sum, lum, lumsum;
-  float mean_angle, mean_magnitude;
+  float mean_magnitude;
   float delta;
+
+//  cv_bridge::CvImage img_bridge;
+//  std_msgs::Header header; // empty header
+//  int counter = 0;
 
 public:
     ImageConverter() : it_(nh_) //c++11 syntax (call it_(nh_) prior to this func )
@@ -59,17 +65,18 @@ public:
     ~ImageConverter()
     {
 //    cv::destroyWindow(OPENCV_WINDOW);
+//    cv::destroyWindow(OPENCV_WINDOW2);
     }
 
     void imageCallback(const sensor_msgs::ImageConstPtr& msg)
     {
-        cv_bridge::CvImageConstPtr cv_ptr;//CvImagePtr cv_ptr;
         try
         {
-            cv_ptr = cv_bridge::toCvShare(msg, "bgr8");//cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
+//            cv_ptr = cv_bridge::toCvShare(msg, "bgr8");
+            cv_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
             cvtColor( cv_ptr->image, src_gray, CV_BGR2GRAY );
             warpPerspective(src_gray, src_warp, M, Size(WIDTH, HEIGHT));
-            medianBlur(src_warp, src_smoothed, 11);
+            medianBlur(src_warp, src_smoothed, 31);
             src_smoothed.convertTo(src_smoothed, CV_64F);
             src_smoothed /= 255.0;
             Sobel( src_smoothed, grad_x, ddepth, 1, 0, 5, scale, d, BORDER_DEFAULT);
@@ -90,8 +97,11 @@ public:
                     lumsum += lum;
                 }
             }
-            delta = (float)(sum)/((float)(lumsum)*5.);
-            printf("res is %.3f \n", (float)(sum)/(float)(lumsum));
+            delta = (float)(sum)/(float)(lumsum);
+            delta -= 150.;
+            delta /= 5.;
+            ROS_INFO("res is %.3f \n", (float)(sum)/(float)(lumsum));
+            ROS_INFO("magnitude %i \n", lumsum);
 //            cartToPolar( grad_x, grad_y, magnitude, angles);
 
         }
@@ -105,11 +115,18 @@ public:
 //         cv::imshow(OPENCV_WINDOW, magnitude);
 //         cv::imshow(OPENCV_WINDOW2, src_smoothed);
 //         cv::waitKey(3);
-         //cv_ptr->image = grad;
-//         this->image_pub_.publish(cv_ptr->toImageMsg());
-        std_msgs::Float32 msg_delta;
-        msg_delta.data = delta;
-        this->delta_pub.publish(msg_delta);
+
+//        header.seq = counter; // user defined counter
+//        header.stamp = ros::Time::now(); // time
+//        img_bridge = cv_bridge::CvImage(header, sensor_msgs::image_encodings::MONO8, magnitude);
+//        this->image_pub_.publish(img_bridge.toImageMsg());
+        if (lumsum > 2000)
+        {
+            std_msgs::Float32 msg_delta;
+            msg_delta.data = delta;
+            this->delta_pub.publish(msg_delta);
+        }
+//        counter ++;
     }
 
 };
