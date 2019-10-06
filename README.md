@@ -4,7 +4,7 @@
 Quadripod robot
 ===================
 
-all the files to build a quadripod, including 3d model, eagle files and arduino code.
+All the files to build a quadripod, including 3d model, eagle files and ROS code.
 
 ![alt text](https://github.com/thib-s/quadripod_robot/raw/master/visuals/jacob.jpg)
 
@@ -26,7 +26,19 @@ Quadripod\_board
 
 Contains the eagle files for the pcb manufacturing.
 
-code
+Code
 ----
 
-Contains the code that runs on the raspberry pi zero. The folder catkin\_ws contains the node to run locally on the robot. The folder camera\_calibration contains the files to calibrate the camera. The folder teleop\_ws contains the nodes to control the robot remotely using a joystick.
+Contains the code that runs on the raspberry pi zero:
+ - The folder `catkin\_ws` contains the node to run locally on the robot. 
+ - The folder `camera\_calibration` contains the files to calibrate the camera. 
+ - The folder `teleop\_ws contains` the nodes to control the robot remotely using a joystick.
+ 
+ROSpbianZero
+------------
+
+Contains the tutorial to setup the raspberry pi zero:
+ 1. install raspbian lite
+ 2. compile and install ros kinetic (perception)
+ 3. setup the service to start a launchfile at boot
+ 4. setup the wifi AP
