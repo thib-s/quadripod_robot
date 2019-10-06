@@ -21,7 +21,7 @@
         <param name="vFlip" value="true"/>
         <param name="quality" value="50"/>
 
-        <param name="framerate" value="10"/>
+        <param name="framerate" value="5"/>
         <param name="exposure_mode" value="antishake"/>
         <param name="shutter_speed" value="0"/>
     </node>

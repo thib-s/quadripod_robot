@@ -8,6 +8,7 @@ from std_msgs.msg import Bool
 joy_value = None
 joy_enabled = True
 enable_button_lastval = True
+time_disabled = 0.
 
 def joy_cb(value):
     global joy_value, joy_enabled, enable_button_lastval
@@ -17,7 +18,7 @@ def joy_cb(value):
     enable_button_lastval = value.buttons[9]
 
 def talker():
-    global joy_value
+    global joy_value, time_disabled
     rospy.init_node('tbot_teleop')
     sub = rospy.Subscriber('/joy', Joy, joy_cb)
     pub = rospy.Publisher('/joy_vel', Twist, queue_size=1)
@@ -26,8 +27,8 @@ def talker():
     while not rospy.is_shutdown():
         if (joy_value is not None) and joy_enabled:
             twist_mv = Twist()
-            twist_mv.linear.x = joy_value.axes[2]
-            twist_mv.angular.z = joy_value.axes[3]
+            twist_mv.linear.x = joy_value.axes[2] * 2
+            twist_mv.angular.z = joy_value.axes[3] * 2
             #if twist.linear.x < 0:
             #    twist.angular.z = - twist.angular.z
             pub.publish(twist_mv)
@@ -37,10 +38,16 @@ def talker():
             twist_pose.angular.y = joy_value.axes[6] * 2
             twist_pose.angular.z = (joy_value.buttons[4] - joy_value.buttons[5]) * 2
             
-            twist_pose.linear.x = joy_value.axes[1] * 2
+            twist_pose.linear.x = joy_value.axes[1] * 2.
             twist_pose.linear.y = (joy_value.buttons[1] - joy_value.buttons[3]) * 2
             twist_pose.linear.z = (joy_value.buttons[6] - joy_value.buttons[7]) * 2
             pub_pose.publish(twist_pose)
+            time_disabled = 0.
+        if not joy_enabled:
+            time_disabled += 0.25
+        if time_disabled >= 150.:
+            twist_mv = Twist()
+            pub.publish(twist_mv)
         rospy.sleep(0.25)
         pub_pause.publish(Bool(joy_enabled))  # tell the mux that we're alive
 

@@ -11,7 +11,7 @@ from sensor_msgs.msg import Image, CompressedImage
 from cv_bridge import CvBridge, CvBridgeError
 import numpy as np
 
-IMG_H = 350
+IMG_H = 300
 
 IMG_W = 300
 
@@ -30,7 +30,7 @@ class image_converter:
 
     def __init__(self):
         self.image_pub = rospy.Publisher("/plannar_cam/image", Image, queue_size=1)
-        # self.angle_pub = rospy.Publisher("/plannar_cam/theta", Float32, queue_size=1)
+        self.angle_pub = rospy.Publisher("/plannar_cam/theta", Float32, queue_size=1)
         self.delta_pub = rospy.Publisher("/plannar_cam/delta", Float32, queue_size=1)
 
         self.bridge = CvBridge()
@@ -45,30 +45,30 @@ class image_converter:
     def compute_gradients(bw_img):
         sobelx = cv2.Sobel(bw_img, cv2.CV_64F, 1, 0, ksize=3)
         sobely = cv2.Sobel(bw_img, cv2.CV_64F, 0, 1, ksize=3)
-        return None, np.sqrt(np.square(sobelx) + np.square(sobely))#cv2.addWeighted(np.abs(sobelx), 0.5, np.abs(sobely), 0.5, 0)
-        # magnitudes, angles = cv2.cartToPolar(sobelx, sobely)
-        # # angles = np.arctan2(sobely, sobelx)
-        # angles[angles > (np.pi / 2)] -= np.pi
-        # angles[angles < (-np.pi / 2)] += np.pi
-        # # modules = np.sqrt(np.square(sobelx) + np.square(sobely))
-        # return angles, magnitudes
+        # return None, np.sqrt(np.square(sobelx) + np.square(sobely))#cv2.addWeighted(np.abs(sobelx), 0.5, np.abs(sobely), 0.5, 0)
+        magnitudes, angles = cv2.cartToPolar(sobelx, sobely)
+        # angles = np.arctan2(sobely, sobelx)
+        angles[angles > (np.pi / 2)] -= np.pi
+        angles[angles < (-np.pi / 2)] += np.pi
+        # modules = np.sqrt(np.square(sobelx) + np.square(sobely))
+        return angles, magnitudes
 
-    # @staticmethod
-    # def extract_theta(angles, modules):
-    #     # avg_angle = np.average(angles, weights=modules)
-    #     values, bins = np.histogram(angles.flatten(), bins=np.arange(-np.pi * 0.5, +np.pi * 0.5, 0.05),
-    #                                 weights=modules.flatten(), density=True)
-    #     # print("sum of modules (theta): %.2f" % modules.sum())
-    #     # print(values)
-    #     major_angle_idx = np.argmax(values)
-    #     major_angle = 0.5 * (bins[major_angle_idx] + bins[major_angle_idx + 1])
-    #     # print("angle: %.3f" % np.rad2deg(avg_angle))
-    #     if modules.sum() > 500000:
-    #         print("major angle: %.3f" % np.rad2deg(major_angle))
-    #         return major_angle
-    #     else:
-    #         print("houston, we lost the line")
-    #         return None
+    @staticmethod
+    def extract_theta(angles, modules):
+        # avg_angle = np.average(angles, weights=modules)
+        values, bins = np.histogram(angles.flatten(), bins=np.arange(-np.pi * 0.5, +np.pi * 0.5, 0.05),
+                                    weights=modules.flatten(), density=True)
+        # print("sum of modules (theta): %.2f" % modules.sum())
+        # print(values)
+        major_angle_idx = np.argmax(values)
+        major_angle = 0.5 * (bins[major_angle_idx] + bins[major_angle_idx + 1])
+        # print("angle: %.3f" % np.rad2deg(avg_angle))
+        if modules.sum() > 500000:
+            print("major angle: %.3f" % np.rad2deg(major_angle))
+            return major_angle
+        else:
+            print("houston, we lost the line")
+            return None
 
     @staticmethod
     def extract_delta(modules):
@@ -84,15 +84,15 @@ class image_converter:
             print("houston we lost the line end")
             return None
 
-    # @staticmethod
-    # def display_vector_field(angles, modules):
-    #     hsv_field = np.ndarray((angles.shape[0], angles.shape[1], 3), dtype=np.float32)
-    #     hsv_field[:, :, 0] = 255 * (angles + (np.pi / 2)) / np.pi  # map angle to hue in [0, 255]
-    #     hsv_field[:, :, 2] = (modules - modules.min()) / (modules.max() - modules.min())  # map module to value [0,1]
-    #     hsv_field[:, :, 1] = 1.  # constant staturation
-    #     bw_img = cv2.cvtColor(hsv_field, cv2.COLOR_HSV2RGB)  # back to rgb
-    #     cv2.imshow("Image window", bw_img)
-    #     cv2.waitKey(3)
+    @staticmethod
+    def display_vector_field(angles, modules):
+        hsv_field = np.ndarray((angles.shape[0], angles.shape[1], 3), dtype=np.float32)
+        hsv_field[:, :, 0] = 255 * (angles + (np.pi / 2)) / np.pi  # map angle to hue in [0, 255]
+        hsv_field[:, :, 2] = (modules - modules.min()) / (modules.max() - modules.min())  # map module to value [0,1]
+        hsv_field[:, :, 1] = 1.  # constant staturation
+        bw_img = cv2.cvtColor(hsv_field, cv2.COLOR_HSV2RGB)  # back to rgb
+        cv2.imshow("Image window", bw_img)
+        cv2.waitKey(3)
 
     def callback(self, data):
         try:
@@ -103,10 +103,12 @@ class image_converter:
             delta = self.extract_delta(magnitudes)
             if delta is not None:
                 self.delta_pub.publish(Float32(delta))
-            # theta = self.extract_theta(angles, magnitudes)
-            # if theta is not None:
-            #     self.angle_pub.publish(Float32(theta))
-            self.image_pub.publish(self.bridge.cv2_to_imgmsg(np.array(bw_img, dtype=np.uint8), "8UC1"))# cv_image, "rgb8"))
+            theta = self.extract_theta(angles, magnitudes)
+            if theta is not None:
+                self.angle_pub.publish(Float32(theta))
+            # self.image_pub.publish(self.bridge.cv2_to_imgmsg(np.array(bw_img, dtype=np.uint8), "8UC1"))# cv_image, "rgb8"))
+            cv2.imshow("reprojected", cv_image)
+            self.display_vector_field(angles, magnitudes)
         except CvBridgeError as e:
             print(e)
 
