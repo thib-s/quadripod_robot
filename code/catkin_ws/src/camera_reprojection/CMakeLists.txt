@@ -3,8 +3,8 @@ project(camera_reprojection)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 add_compile_options(-std=c++11)
-set(OpenCV_DIR /usr/share/OpenCV/)
-#set(OpenCV_DIR $ENV{ROS_PACKAGE_PATH}/OpenCV-3.3.1-dev/)
+#set(OpenCV_DIR /usr/share/OpenCV/)
+set(OpenCV_DIR $ENV{ROS_PACKAGE_PATH}/OpenCV-3.3.1-dev/)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
