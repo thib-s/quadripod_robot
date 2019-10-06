@@ -1,6 +1,6 @@
 <launch>
 
-    <include file="$(find jacob_bringup)/launch/tbot_cam.launch"/>
+    <include file="$(find tbot_bringup)/launch/tbot_cam.launch"/>
 
     <node pkg="base_controller" type="walk_controller.py" name="gait_controller">
     </node>
@@ -8,8 +8,8 @@
     </node>
 
     <arg name="cmd_vel_out" default="/cmd_vel"/>
-    <arg name="config_locks"  default="$(find jacob_bringup)/config/twist_mux_locks.yaml"/>
-    <arg name="config_topics" default="$(find jacob_bringup)/config/twist_mux_topics.yaml"/>
+    <arg name="config_locks"  default="$(find tbot_bringup)/config/twist_mux_locks.yaml"/>
+    <arg name="config_topics" default="$(find tbot_bringup)/config/twist_mux_topics.yaml"/>
 
     <node pkg="twist_mux" type="twist_mux" name="twist_mux" output="screen">
         <remap from="cmd_vel_out" to="$(arg cmd_vel_out)"/>

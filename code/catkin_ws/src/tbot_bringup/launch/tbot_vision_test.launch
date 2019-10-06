@@ -1,0 +1,11 @@
+<launch>
+
+    <include file="$(find tbot_bringup)/launch/tbot_cam.launch"/>
+
+    <node pkg="line_follower" type="LineFollower.py" name="line_follower"/>
+    <node pkg="camera_reprojection" type="camera_reprojection_node" name="camera_reprojection" output="screen">
+    <param name="image_transport" value="compressed" />
+    </node>
+
+
+</launch>
