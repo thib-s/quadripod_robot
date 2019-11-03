@@ -27,7 +27,7 @@ def talker():
     while not rospy.is_shutdown():
         if (joy_value is not None) and joy_enabled:
             twist_mv = Twist()
-            twist_mv.linear.x = joy_value.axes[2] * 1.5
+            twist_mv.linear.x = joy_value.axes[4] * 1.5
             twist_mv.angular.z = joy_value.axes[3] * 1.5
             #if twist.linear.x < 0:
             #    twist.angular.z = - twist.angular.z
