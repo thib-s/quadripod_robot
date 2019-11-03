@@ -18,11 +18,12 @@ class QuadripodModel():
 
         # how much to raise the legs when walking
         self.delta = 15
+        self.bound = 2.0
 
         self.init_angles = np.array(
             [[90, 90 + self.delta, 90, 90 - self.delta, 90, 90 - self.delta, 90, 90 + self.delta]])
         # values to correct mechanical alignment of servos
-        self.corrections = np.array([-20, 60, 20, -50, 20, -40, -20, 60])
+        self.corrections = np.array([-20, 40, 20, -30, 15, -20, -20, 40])
 
         # how to affect the values when moving the body without walking
         # body_p* refers to position
@@ -54,8 +55,8 @@ class QuadripodModel():
         rotation
         :return: the sequence of the servos position as np array
         """
-        linear = 0.5 * twist.linear.x + 0.5
-        angular = 0.5 * twist.angular.z + 0.5
+        linear = 0.5 * max(min(twist.linear.x, self.bound), -self.bound) + 0.5
+        angular = 0.5 * max(min(twist.angular.z, self.bound), -self.bound) + 0.5
         linear_sequence = np.array([
             [70 , 90 - self.delta, 70,  90 - self.delta, 110, 90 - self.delta, 110, 90 - self.delta],
             [70,  90 + self.delta, 70,  90 + self.delta, 110, 90 + self.delta, 110, 90 + self.delta],
@@ -93,12 +94,12 @@ class QuadripodModel():
         """
         print("body position updated to: %s" % twist)
         self.body_twist = Twist()
-        self.body_twist.linear.x = twist.linear.x
-        self.body_twist.linear.y = twist.linear.y
-        self.body_twist.linear.z = twist.linear.z
-        self.body_twist.angular.x = twist.angular.x
-        self.body_twist.angular.y = twist.angular.y
-        self.body_twist.angular.z = twist.angular.z
+        self.body_twist.linear.x = max(min(twist.linear.x, self.bound), -self.bound)
+        self.body_twist.linear.y = max(min(twist.linear.y, self.bound), -self.bound)
+        self.body_twist.linear.z = max(min(twist.linear.z, self.bound), -self.bound)
+        self.body_twist.angular.x = max(min(twist.angular.x, self.bound), -self.bound)
+        self.body_twist.angular.y = max(min(twist.angular.y, self.bound), -self.bound)
+        self.body_twist.angular.z = max(min(twist.angular.z, self.bound), -self.bound)
 
 
 if __name__ == '__main__':
